@@ -6,6 +6,7 @@ import lombok.Getter;
 import net.minecraft.core.Holder.Reference;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.BlockHitResult;
@@ -42,6 +43,10 @@ public class ManasSkillInstance implements Cloneable {
 
     public ManasSkillInstance(ManasSkill skill) {
         this.skillRegistryObject = SkillAPI.getSkillRegistry().getDelegateOrThrow(skill);
+    }
+
+    public boolean is(TagKey<ManasSkill> tag) {
+        return this.skillRegistryObject.is(tag);
     }
 
     /**

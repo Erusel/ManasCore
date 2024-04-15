@@ -5,6 +5,7 @@ import com.github.manasmods.manascore.api.skills.ManasSkillInstance;
 import com.github.manasmods.manascore.api.skills.SkillAPI;
 import com.github.manasmods.manascore.api.skills.TickingSkill;
 import com.github.manasmods.manascore.api.skills.capability.SkillStorage;
+import com.github.manasmods.manascore.api.skills.event.SkillCooldownUpdateEvent;
 import com.github.manasmods.manascore.api.skills.event.SkillTickEvent;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
@@ -77,6 +78,7 @@ public class TickEventListenerHandler {
         SkillStorage skillStorage = SkillAPI.getSkillsFrom(serverPlayer);
         for (ManasSkillInstance instance : skillStorage.getLearnedSkills()) {
             if (!instance.onCoolDown()) continue;
+            if (MinecraftForge.EVENT_BUS.post(new SkillCooldownUpdateEvent(instance, serverPlayer, instance.getCoolDown()))) continue;
             instance.decreaseCoolDown(1);
         }
         skillStorage.syncChanges();
