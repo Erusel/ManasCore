@@ -10,7 +10,7 @@ import org.jetbrains.annotations.ApiStatus;
  * This Event is fired right before {@link ManasSkillInstance#decreaseCoolDown} is invoked.
  * Cancel this event to prevent the {@link ManasSkillInstance#decreaseCoolDown} invocation.
  */
-@ApiStatus.AvailableSince("2.0.18.0")
+@ApiStatus.AvailableSince("2.1.3.4")
 @Cancelable
 public class SkillCooldownUpdateEvent extends SkillEvent {
     @Getter
