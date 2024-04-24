@@ -374,7 +374,7 @@ public class ManasSkillInstance implements Cloneable {
      * @param modifier Affected {@link AttributeModifier} that this skill provides.
      */
     public double getAttributeModifierAmplifier(LivingEntity entity, AttributeModifier modifier) {
-        return this.getSkill().getAttributeModifieraAmplifier(this, entity, modifier);
+        return this.getSkill().getAttributeModifierAmplifier(this, entity, modifier);
     }
 
     /**
