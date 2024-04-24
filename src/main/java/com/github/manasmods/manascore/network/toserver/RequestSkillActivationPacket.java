@@ -44,12 +44,14 @@ public class RequestSkillActivationPacket {
 
                     Optional<ManasSkillInstance> optional = storage.getSkill(manasSkill);
                     if (optional.isEmpty()) continue;
-                    ManasSkillInstance skillInstance = optional.get();
+                    ManasSkillInstance instance = optional.get();
 
-                    if (!skillInstance.canInteractSkill(player)) continue;
-                    if (skillInstance.onCoolDown() && !skillInstance.canIgnoreCoolDown(player)) continue;
-                    skillInstance.onPressed(player);
-                    TickEventListenerHandler.tickingSkills.put(player.getUUID(), new TickingSkill(skillInstance.getSkill()));
+                    if (!instance.canInteractSkill(player)) continue;
+                    if (instance.onCoolDown() && !instance.canIgnoreCoolDown(player)) continue;
+
+                    instance.onPressed(player);
+                    instance.addHeldAttributeModifiers(player);
+                    TickEventListenerHandler.tickingSkills.put(player.getUUID(), new TickingSkill(instance.getSkill()));
                 }
                 storage.syncChanges();
             }

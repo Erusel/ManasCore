@@ -9,6 +9,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraftforge.event.entity.ProjectileImpactEvent;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
@@ -364,6 +365,25 @@ public class ManasSkillInstance implements Cloneable {
     public void setTag(@Nullable CompoundTag tag) {
         this.tag = tag;
         markDirty();
+    }
+
+    /**
+     * @return the amplifier for each attribute modifier that this instance applies.
+     * </p>
+     * @param entity   Affected {@link LivingEntity} owning this Skill.
+     * @param modifier Affected {@link AttributeModifier} that this skill provides.
+     */
+    public double getAttributeModifierAmplifier(LivingEntity entity, AttributeModifier modifier) {
+        return this.getSkill().getAttributeModifieraAmplifier(this, entity, modifier);
+    }
+
+    /**
+     * Applies the attribute modifiers of this instance on the {@link LivingEntity} holding the skill activation button.
+     *
+     * @param entity   Affected {@link LivingEntity} owning this Skill.
+     */
+    public void addHeldAttributeModifiers(LivingEntity entity) {
+        this.getSkill().addHeldAttributeModifiers(this, entity);
     }
 
     /**
