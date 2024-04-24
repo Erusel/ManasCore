@@ -196,12 +196,13 @@ public class ManasSkill {
      * Applies the attribute modifiers of this skill on the {@link LivingEntity} holding the skill activation button.
      *
      * @param entity   Affected {@link LivingEntity} owning this Skill.
+     * @param instance Affected {@link ManasSkillInstance}
      */
-    public void addHeldAttributeModifiers(LivingEntity entity) {
+    public void addHeldAttributeModifiers(ManasSkillInstance instance, LivingEntity entity) {
         String descriptionId = Util.makeDescriptionId("skill", this.getRegistryName());
         for(Map.Entry<Attribute, AttributeModifier> entry : this.onHeldAttributeModifiers.entrySet()) {
             AttributeInstance attributeinstance = entity.getAttributes().getInstance(entry.getKey());
-            if (attributeinstance != null) {
+            if (attributeinstance != null && !attributeinstance.hasModifier(entry.getValue())) {
                 AttributeModifier attributemodifier = entry.getValue();
                 attributeinstance.removeModifier(attributemodifier);
                 attributeinstance.addPermanentModifier(new AttributeModifier(attributemodifier.getId(),
