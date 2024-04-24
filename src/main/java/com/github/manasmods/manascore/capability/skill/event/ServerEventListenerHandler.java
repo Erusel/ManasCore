@@ -215,6 +215,10 @@ public class ServerEventListenerHandler {
     public static void onLogOut(final PlayerEvent.PlayerLoggedOutEvent e) {
         Player player = e.getEntity();
         Multimap<UUID, TickingSkill> multimap = TickEventListenerHandler.tickingSkills;
-        if (multimap.containsKey(player.getUUID())) multimap.removeAll(player.getUUID());
+        if (multimap.containsKey(player.getUUID()))
+            multimap.get(player.getUUID()).removeIf(tickingSkill -> {
+                tickingSkill.getSkill().removeHeldAttributeModifiers(player);
+                return true;
+            });
     }
 }

@@ -10,8 +10,9 @@ public class TickingSkill {
     private int duration = 0;
     @Getter
     private final ManasSkill skill;
-    public TickingSkill(ManasSkill skill) {
+    public TickingSkill(ManasSkill skill, LivingEntity entity) {
         this.skill = skill;
+        skill.addHeldAttributeModifiers(entity);
     }
 
     public boolean tick(SkillStorage storage, LivingEntity entity) {
@@ -19,9 +20,10 @@ public class TickingSkill {
         if (optional.isEmpty()) return false;
 
         ManasSkillInstance instance = optional.get();
-        if (reachedMaxDuration(instance, entity)) return false;
-
-        if (!instance.canInteractSkill(entity)) return false;
+        if (reachedMaxDuration(instance, entity) || !instance.canInteractSkill(entity)) {
+            skill.removeHeldAttributeModifiers(entity);
+            return false;
+        }
         return instance.onHeld(entity, this.duration++);
     }
 

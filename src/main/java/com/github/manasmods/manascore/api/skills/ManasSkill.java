@@ -3,24 +3,27 @@ package com.github.manasmods.manascore.api.skills;
 import com.github.manasmods.manascore.api.skills.capability.SkillStorage;
 import com.github.manasmods.manascore.api.skills.event.SkillDamageEvent;
 import com.github.manasmods.manascore.api.skills.event.UnlockSkillEvent;
+import com.google.common.collect.Maps;
+import net.minecraft.Util;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraftforge.event.entity.ProjectileImpactEvent;
-import net.minecraftforge.event.entity.living.LivingAttackEvent;
-import net.minecraftforge.event.entity.living.LivingChangeTargetEvent;
-import net.minecraftforge.event.entity.living.LivingDamageEvent;
-import net.minecraftforge.event.entity.living.LivingDeathEvent;
-import net.minecraftforge.event.entity.living.LivingHurtEvent;
+import net.minecraftforge.event.entity.living.*;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.Event;
 import org.jetbrains.annotations.ApiStatus;
 
 import javax.annotation.Nullable;
+import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
 
 /**
  * This is the Registry Object for Skills.
@@ -39,6 +42,8 @@ import java.util.Objects;
  */
 @ApiStatus.AvailableSince("1.0.2.0")
 public class ManasSkill {
+    private final Map<Attribute, AttributeModifier> onHeldAttributeModifiers = Maps.newHashMap();
+
     /**
      * Used to create a {@link ManasSkillInstance} of this Skill.
      * <p>
@@ -174,6 +179,47 @@ public class ManasSkill {
         if (isMastered(instance, entity)) return;
         instance.setMastery(instance.getMastery() + 1);
         if (isMastered(instance, entity)) onSkillMastered(instance, entity);
+    }
+
+    /**
+     * Adds an attribute modifier to this skill. This method can be called for more than one attribute.
+     * The attributes are applied to an entity when the skill is held and removed when it stops being held.
+     * </p>
+     */
+    public void addHeldAttributeModifier(Attribute pAttribute, String pUuid, double pAmount, AttributeModifier.Operation pOperation) {
+        AttributeModifier attributemodifier = new AttributeModifier(UUID.fromString(pUuid),
+                Util.makeDescriptionId("skill", this.getRegistryName()), pAmount, pOperation);
+        this.onHeldAttributeModifiers.put(pAttribute, attributemodifier);
+    }
+
+    /**
+     * Applies the attribute modifiers of this skill on the {@link LivingEntity} holding the skill activation button.
+     *
+     * @param entity   Affected {@link LivingEntity} owning this Skill.
+     */
+    public void addHeldAttributeModifiers(LivingEntity entity) {
+        String descriptionId = Util.makeDescriptionId("skill", this.getRegistryName());
+        for(Map.Entry<Attribute, AttributeModifier> entry : this.onHeldAttributeModifiers.entrySet()) {
+            AttributeInstance attributeinstance = entity.getAttributes().getInstance(entry.getKey());
+            if (attributeinstance != null) {
+                AttributeModifier attributemodifier = entry.getValue();
+                attributeinstance.removeModifier(attributemodifier);
+                attributeinstance.addPermanentModifier(new AttributeModifier(attributemodifier.getId(),
+                        descriptionId, attributemodifier.getAmount(), attributemodifier.getOperation()));
+            }
+        }
+    }
+
+    /**
+     * Removes the attribute modifiers of this skill from the {@link LivingEntity} holding the skill activation button.
+     *
+     * @param entity   Affected {@link LivingEntity} owning this Skill.
+     */
+    public void removeHeldAttributeModifiers(LivingEntity entity) {
+        for(Map.Entry<Attribute, AttributeModifier> entry : this.onHeldAttributeModifiers.entrySet()) {
+            AttributeInstance attributeinstance = entity.getAttributes().getInstance(entry.getKey());
+            if (attributeinstance != null) attributeinstance.removeModifier(entry.getValue());
+        }
     }
 
     /**

@@ -8,6 +8,8 @@ import lombok.extern.log4j.Log4j2;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.monster.Creeper;
 import net.minecraft.world.entity.monster.Spider;
 import net.minecraft.world.entity.player.Player;
@@ -16,24 +18,23 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.ProjectileImpactEvent;
-import net.minecraftforge.event.entity.living.LivingAttackEvent;
-import net.minecraftforge.event.entity.living.LivingChangeTargetEvent;
-import net.minecraftforge.event.entity.living.LivingDamageEvent;
-import net.minecraftforge.event.entity.living.LivingDeathEvent;
-import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
-import net.minecraftforge.event.entity.living.LivingHurtEvent;
+import net.minecraftforge.event.entity.living.*;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import org.jetbrains.annotations.ApiStatus.Internal;
 
 @Internal
 @Log4j2
 public class TestSkill extends ManasSkill {
+    protected static final String TEST = "e83b2e47-ef49-4af5-b5da-4fd14a5c8777";
     public TestSkill(){
         MinecraftForge.EVENT_BUS.addListener(this::unlock);
+        this.addHeldAttributeModifier(Attributes.MOVEMENT_SPEED, TEST, 1.0F, AttributeModifier.Operation.MULTIPLY_TOTAL);
     }
+
     public boolean canTick(ManasSkillInstance instance, LivingEntity entity) {
         return instance.isToggled();
     }
+
     public void onToggleOn(ManasSkillInstance instance, LivingEntity entity) {
         log.debug("Toggled On");
     }
