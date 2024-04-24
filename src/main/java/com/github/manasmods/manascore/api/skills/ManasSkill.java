@@ -199,7 +199,7 @@ public class ManasSkill {
      * @param instance Affected {@link ManasSkillInstance}
      * @param modifier Affected {@link AttributeModifier} that this skill provides.
      */
-    public double getAttributeModifieraAmplifier(ManasSkillInstance instance, LivingEntity entity, AttributeModifier modifier) {
+    public double getAttributeModifierAmplifier(ManasSkillInstance instance, LivingEntity entity, AttributeModifier modifier) {
         return 1;
     }
 
