@@ -19,14 +19,10 @@ public class TickingSkill {
         if (optional.isEmpty()) return false;
 
         ManasSkillInstance instance = optional.get();
-        if (reachedMaxDuration(instance, entity) || !instance.canInteractSkill(entity)) {
-            skill.removeHeldAttributeModifiers(entity);
-            return false;
-        }
+        if (reachedMaxDuration(instance, entity)) return false;
 
-        boolean onHeld = instance.onHeld(entity, this.duration++);
-        if (onHeld) instance.getSkill().addHeldAttributeModifiers(instance, entity);
-        return onHeld;
+        if (!instance.canInteractSkill(entity)) return false;
+        return instance.onHeld(entity, this.duration++);
     }
 
     public boolean reachedMaxDuration(ManasSkillInstance instance, LivingEntity entity) {

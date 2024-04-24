@@ -54,16 +54,12 @@ public class RequestSkillReleasePacket {
 
                     if (!skillInstance.canInteractSkill(player)) continue;
                     if (skillInstance.onCoolDown() && !skillInstance.canIgnoreCoolDown(player)) continue;
+
                     skillInstance.onRelease(player, this.heldTick);
+                    skillInstance.getSkill().removeHeldAttributeModifiers(player);
 
                     Multimap<UUID, TickingSkill> multimap = TickEventListenerHandler.tickingSkills;
-                    if (multimap.containsKey(player.getUUID())) {
-                        multimap.get(player.getUUID()).removeIf(tickingSkill -> {
-                            boolean isTicking = tickingSkill.getSkill() == skillInstance.getSkill();
-                            if (isTicking) tickingSkill.getSkill().removeHeldAttributeModifiers(player);
-                            return isTicking;
-                        });
-                    }
+                    if (multimap.containsKey(player.getUUID())) multimap.get(player.getUUID()).removeIf(tickingSkill -> tickingSkill.getSkill() == skillInstance.getSkill());
                 }
                 storage.syncChanges();
             }

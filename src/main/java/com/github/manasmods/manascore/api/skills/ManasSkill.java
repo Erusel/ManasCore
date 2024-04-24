@@ -193,6 +193,17 @@ public class ManasSkill {
     }
 
     /**
+     * @return the amplifier for each attribute modifier that this skill applies.
+     * </p>
+     * @param entity   Affected {@link LivingEntity} owning this Skill.
+     * @param instance Affected {@link ManasSkillInstance}
+     * @param modifier Affected {@link AttributeModifier} that this skill provides.
+     */
+    public double getAttributeModifieraAmplifier(ManasSkillInstance instance, LivingEntity entity, AttributeModifier modifier) {
+        return 1;
+    }
+
+    /**
      * Applies the attribute modifiers of this skill on the {@link LivingEntity} holding the skill activation button.
      *
      * @param entity   Affected {@link LivingEntity} owning this Skill.
@@ -206,7 +217,7 @@ public class ManasSkill {
                 AttributeModifier attributemodifier = entry.getValue();
                 attributeinstance.removeModifier(attributemodifier);
                 attributeinstance.addPermanentModifier(new AttributeModifier(attributemodifier.getId(),
-                        descriptionId, attributemodifier.getAmount(), attributemodifier.getOperation()));
+                        descriptionId, instance.getAttributeModifierAmplifier(entity, attributemodifier), attributemodifier.getOperation()));
             }
         }
     }
