@@ -42,7 +42,7 @@ import java.util.UUID;
  */
 @ApiStatus.AvailableSince("1.0.2.0")
 public class ManasSkill {
-    private final Map<Attribute, AttributeModifier> onHeldAttributeModifiers = Maps.newHashMap();
+    protected final Map<Attribute, AttributeModifier> onHeldAttributeModifiers = Maps.newHashMap();
 
     /**
      * Used to create a {@link ManasSkillInstance} of this Skill.
