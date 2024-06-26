@@ -1,7 +1,6 @@
 package com.github.manasmods.manascore.api.skills.event;
 
 import lombok.Getter;
-import lombok.Setter;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
@@ -17,19 +16,41 @@ import org.jetbrains.annotations.ApiStatus;
 public class SkillDamageEvent extends Event {
     @Getter
     private final LivingHurtEvent event;
-    @Getter
-    private final LivingEntity entity;
-    @Getter
-    private final DamageSource source;
-    @Getter
-    @Setter
-    private float amount;
 
     public SkillDamageEvent(LivingHurtEvent event) {
         this.event = event;
-        this.entity = event.getEntity();
-        this.source = event.getSource();
-        this.amount = event.getAmount();
+    }
+
+    public LivingEntity getEntity() {
+        return this.event.getEntity();
+    }
+
+    public DamageSource getSource() {
+        return this.event.getSource();
+    }
+
+    public float getAmount() {
+        return this.event.getAmount();
+    }
+
+    public void setAmount(float amount) {
+        this.event.setAmount(amount);
+    }
+
+    public boolean isCanceled() {
+        return this.event.isCanceled();
+    }
+
+    public void setCanceled(boolean cancel) {
+        this.event.setCanceled(cancel);
+    }
+
+    public Result getResult() {
+        return this.event.getResult();
+    }
+
+    public void setResult(Result value) {
+        this.event.setResult(value);
     }
 
     /**
