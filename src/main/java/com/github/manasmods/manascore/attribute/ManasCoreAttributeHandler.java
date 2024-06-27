@@ -6,14 +6,19 @@ package com.github.manasmods.manascore.attribute;
 
 import com.github.manasmods.manascore.ManasCore;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.protocol.game.ClientboundAnimatePacket;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingJumpEvent;
 import net.minecraftforge.event.entity.living.LivingFallEvent;
+import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.player.CriticalHitEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.Event;
@@ -54,6 +59,24 @@ public class ManasCoreAttributeHandler {
 
         double additionalJumpBlock = (instance.getValue() - 0.42) / 0.2;
         e.setDistance((float) (e.getDistance() - additionalJumpBlock));
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGH)
+    public static void applyEntityCrit(final LivingHurtEvent e) {
+        if (!(e.getSource().getDirectEntity() instanceof LivingEntity entity)) return; // Direct attack
+        if (entity instanceof Player) return; // Players have their own Critical Event
+        double critChance = entity.getAttributeValue(ManasCoreAttributes.CRIT_CHANCE.get()) / 100; // Convert to %
+
+        RandomSource rand = entity.getRandom();
+        if (rand.nextFloat() > critChance) return;
+        float critMultiplier = (float) entity.getAttributeValue(ManasCoreAttributes.CRIT_MULTIPLIER.get());
+        e.setAmount(e.getAmount() * critMultiplier);
+
+        LivingEntity target = e.getEntity();
+        target.getLevel().playSound(null, target.getX(), target.getY(), target.getZ(),
+                SoundEvents.PLAYER_ATTACK_CRIT, entity.getSoundSource(), 1.0F, 1.0F);
+        if (entity.getLevel() instanceof ServerLevel level)
+            level.getChunkSource().broadcastAndSend(entity, new ClientboundAnimatePacket(target, 4));
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
