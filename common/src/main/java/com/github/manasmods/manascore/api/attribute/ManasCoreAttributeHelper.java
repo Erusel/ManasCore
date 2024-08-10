@@ -1,6 +1,8 @@
 package com.github.manasmods.manascore.api.attribute;
 
 import lombok.experimental.UtilityClass;
+import net.minecraft.core.Holder;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
@@ -19,13 +21,13 @@ public class ManasCoreAttributeHelper {
      * @param attribute Target Attribute
      * @param modifier  Attribute modifier
      */
-    public static void setModifier(final LivingEntity entity, final Attribute attribute, final AttributeModifier modifier) {
+    public static void setModifier(final LivingEntity entity, final Holder<Attribute> attribute, final AttributeModifier modifier) {
         AttributeInstance instance = entity.getAttribute(attribute);
         if (instance == null) return;
 
         double oldMaxHealth = attribute == Attributes.MAX_HEALTH ? entity.getMaxHealth() : 0; // Store old max health or 0
-        Optional.ofNullable(instance.getModifier(modifier.getId())) //Get old modifier if present
-                .ifPresent(modifier1 -> instance.removeModifier(modifier1.getId())); //Remove old modifier
+        Optional.ofNullable(instance.getModifier(modifier.id())) //Get old modifier if present
+                .ifPresent(modifier1 -> instance.removeModifier(modifier1.id())); //Remove old modifier
 
         instance.addPermanentModifier(modifier); //Add modifier
 
@@ -43,27 +45,26 @@ public class ManasCoreAttributeHelper {
     }
 
     /**
-     * @param entity                Target Entity
-     * @param attribute             Target Attribute
-     * @param attributeModifierId   A unique id to identify this {@link AttributeModifier}
-     * @param attributeModifierName A unique name which is used to store the {@link AttributeModifier}
-     * @param amount                Will be used to calculate the final value of the {@link Attribute}
-     * @param attributeOperation    Mathematical operation type which is used to calculate the final value of the {@link Attribute}
+     * @param entity                      Target Entity
+     * @param attribute                   Target Attribute
+     * @param attributeModifierLocation   A unique ResourceLocation to identify this {@link AttributeModifier}
+     * @param amount                      Will be used to calculate the final value of the {@link Attribute}
+     * @param attributeOperation          Mathematical operation type which is used to calculate the final value of the {@link Attribute}
      */
-    public static void addModifier(final LivingEntity entity, final Attribute attribute, final UUID attributeModifierId, final String attributeModifierName, final double amount,
+    public static void addModifier(final LivingEntity entity, final Holder<Attribute> attribute, final ResourceLocation attributeModifierLocation, final double amount,
                                    final AttributeModifier.Operation attributeOperation) {
-        setModifier(entity, attribute, new AttributeModifier(attributeModifierId, attributeModifierName, amount, attributeOperation));
+        setModifier(entity, attribute, new AttributeModifier(attributeModifierLocation, amount, attributeOperation));
     }
 
     /**
      * Safe way to remove {@link AttributeModifier} from Entities
      *
-     * @param entity              Target Entity
-     * @param attribute           Target Attribute
-     * @param attributeModifierId Unique modifier id
+     * @param entity                    Target Entity
+     * @param attribute                 Target Attribute
+     * @param attributeModifierLocation Unique modifier ResourceLocation
      */
-    public static void removeModifier(final LivingEntity entity, final Attribute attribute, final UUID attributeModifierId) {
-        Optional.ofNullable(entity.getAttribute(attribute)).ifPresent(attributeInstance -> attributeInstance.removeModifier(attributeModifierId));
+    public static void removeModifier(final LivingEntity entity, final Holder<Attribute> attribute, final ResourceLocation attributeModifierLocation) {
+        Optional.ofNullable(entity.getAttribute(attribute)).ifPresent(attributeInstance -> attributeInstance.removeModifier(attributeModifierLocation));
     }
 
     /**
@@ -73,7 +74,7 @@ public class ManasCoreAttributeHelper {
      * @param attribute Target Attribute
      * @param modifier  Modifier
      */
-    public static void removeModifier(final LivingEntity entity, final Attribute attribute, final AttributeModifier modifier) {
-        removeModifier(entity, attribute, modifier.getId());
+    public static void removeModifier(final LivingEntity entity, final Holder<Attribute> attribute, final AttributeModifier modifier) {
+        removeModifier(entity, attribute, modifier.id());
     }
 }
