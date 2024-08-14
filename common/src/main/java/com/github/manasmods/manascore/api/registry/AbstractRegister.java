@@ -7,6 +7,7 @@ import com.mojang.datafixers.types.Type;
 import dev.architectury.registry.registries.DeferredRegister;
 import dev.architectury.registry.registries.RegistrySupplier;
 import lombok.NonNull;
+import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityDimensions;
@@ -28,6 +29,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.entity.BlockEntityType.BlockEntitySupplier;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import org.jetbrains.annotations.Nullable;
+import org.w3c.dom.Attr;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -384,7 +386,7 @@ public abstract class AbstractRegister<R extends AbstractRegister<R>> {
             RegistrySupplier<EntityType<T>> supplier = this.register.entityTypes.register(this.id, () -> {
                 EntityType.Builder<T> builder = EntityType.Builder.of(this.entityFactory, this.category)
                         .clientTrackingRange(this.trackingRange)
-                        .sized(this.dimensions.width, this.dimensions.height)
+                        .sized(this.dimensions.width(), this.dimensions.height())
                         .updateInterval(this.updateInterval);
 
                 if (!this.summonable) builder.noSummon();
@@ -518,9 +520,12 @@ public abstract class AbstractRegister<R extends AbstractRegister<R>> {
             RegistrySupplier<RangedAttribute> supplier = this.register.attributes.register(this.id, () -> (RangedAttribute) new RangedAttribute(String.format("%s.attribute.%s", this.id.getNamespace(), this.id.getPath().replaceAll("/", ".")), this.defaultValue, this.minimumValue, this.maximumValue).setSyncable(this.syncable));
 
             supplier.listen(attribute -> {
+                //Shouldn't probably do this, this way. TODO: Find another way to do this, in my search, I didnt find another one.
+                Holder<Attribute> attributeHolder = Holder.direct((Attribute) attribute);
+
                 // TODO something in here is broken on NeoForge and probably on Forge too
-                if (this.applyToAll) ManasAttributeRegistry.registerToAll(builder -> builder.add(attribute, this.defaultValue));
-                this.applicableEntityTypes.forEach((typeSupplier, defaultValue) -> ManasAttributeRegistry.register(typeSupplier, builder -> builder.add(attribute, defaultValue)));
+                if (this.applyToAll) ManasAttributeRegistry.registerToAll(builder -> builder.add(attributeHolder, this.defaultValue));
+                this.applicableEntityTypes.forEach((typeSupplier, defaultValue) -> ManasAttributeRegistry.register(typeSupplier, builder -> builder.add(attributeHolder, defaultValue)));
             });
 
             return supplier;
@@ -590,7 +595,7 @@ public abstract class AbstractRegister<R extends AbstractRegister<R>> {
 
         private ContentBuilder(final R register, final String name) {
             this.register = register;
-            this.id = new ResourceLocation(this.register.modId, name);
+            this.id = ResourceLocation.fromNamespaceAndPath(register.modId, name);
         }
 
         public R build() {
