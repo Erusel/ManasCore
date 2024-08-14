@@ -35,7 +35,8 @@ public class RequestSweepChancePacket {
     private void sweepAttack(Player player) {
         float attack = ManasCoreAttributeUtils.getAttackDamage(player);
         double radiusAddition = player.isCreative() ? 3 : 1.5F; //TODO Entity Reach Attribute
-        float sweepAttack = 1.0F + EnchantmentHelper.getSweepingDamageRatio(player) * attack;
+        //TODO: Find out what happened to getSweepingDamageRatio
+        float sweepAttack = 1.0F + /*EnchantmentHelper.getSweepingDamageRatio(player)*/ 0.2F * attack;
 
         AABB sweepArea = player.getBoundingBox().inflate(1.0 + radiusAddition, 0.25, 1.0 + radiusAddition)
                 .move(ManasCoreAttributeUtils.getLookTowardVec(player, 1 + radiusAddition));
