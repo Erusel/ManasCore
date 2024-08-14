@@ -8,12 +8,14 @@ import com.github.manasmods.manascore.storage.CombinedStorage;
 import com.github.manasmods.manascore.storage.StorageManager;
 import com.github.manasmods.manascore.storage.StorageManager.StorageKey;
 import com.github.manasmods.manascore.utils.PlayerLookup;
+import net.minecraft.core.Holder;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
@@ -102,7 +104,9 @@ public class MixinEntity implements StorageHolder {
         Entity entity = (Entity) (Object) this;
         if (!(entity instanceof LivingEntity living)) return;
 
-        AttributeInstance instance = living.getAttribute(ManasCoreAttributes.STEP_HEIGHT_ADDITION.get());
+        Holder<Attribute> attributeHolder = Holder.direct(ManasCoreAttributes.STEP_HEIGHT_ADDITION.get());
+
+        AttributeInstance instance = living.getAttribute(attributeHolder);
         if (instance == null) return;
         cir.setReturnValue((float) (cir.getReturnValue() + instance.getValue()));
     }

@@ -19,7 +19,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.EntityHitResult;
 
 public class SkillRegistry {
-    private static final ResourceLocation registryId = new ResourceLocation(ManasCore.MOD_ID, "skills");
+    private static final ResourceLocation registryId = ResourceLocation.fromNamespaceAndPath(ManasCore.MOD_ID, "skills");
     public static final Registrar<ManasSkill> SKILLS = RegistrarManager.get(ManasCore.MOD_ID).<ManasSkill>builder(registryId)
             .syncToClients()
             .build();
@@ -98,7 +98,7 @@ public class SkillRegistry {
             return EventResult.pass();
         });
 
-        PlayerEvent.PLAYER_RESPAWN.register((newPlayer, conqueredEnd) -> {
+        PlayerEvent.PLAYER_RESPAWN.register((newPlayer, conqueredEnd, removalReason) -> {
             for (ManasSkillInstance instance : SkillAPI.getSkillsFrom(newPlayer).getLearnedSkills()) {
                 if (!instance.canInteractSkill(newPlayer)) continue;
                 instance.onRespawn(newPlayer, conqueredEnd);

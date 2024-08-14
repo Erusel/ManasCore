@@ -1,10 +1,12 @@
 package com.github.manasmods.manascore.core;
 
 import com.github.manasmods.manascore.api.world.entity.EntityEvents;
+import net.minecraft.core.Holder;
 import net.minecraft.world.entity.LivingEntity;
 import com.github.manasmods.manascore.attribute.ManasCoreAttributes;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.level.material.Fluid;
 import org.spongepowered.asm.mixin.Mixin;
@@ -23,7 +25,9 @@ public abstract class MixinLivingEntity {
     @Inject(method = "getJumpPower", at = @At("RETURN"), cancellable = true)
     protected void getJumpPower(CallbackInfoReturnable<Float> cir) {
         LivingEntity entity = (LivingEntity) (Object) this;
-        AttributeInstance instance = entity.getAttribute(ManasCoreAttributes.JUMP_STRENGTH.get());
+        Holder<Attribute> attributeHolder = Holder.direct(ManasCoreAttributes.JUMP_STRENGTH.get());
+
+        AttributeInstance instance = entity.getAttribute(attributeHolder);
         if (instance == null) return;
 
         double newJump = (cir.getReturnValue() - getJumpBoostPower()) / 0.42F * instance.getValue();
@@ -34,7 +38,8 @@ public abstract class MixinLivingEntity {
             target = "Lnet/minecraft/world/entity/LivingEntity;calculateFallDamage(FF)I"), index = 0)
     public float causeFallDamage(float fallDistance, float multiplier) {
         LivingEntity entity = (LivingEntity) (Object) this;
-        AttributeInstance instance = entity.getAttribute(ManasCoreAttributes.JUMP_STRENGTH.get());
+        Holder<Attribute> attributeHolder = Holder.direct(ManasCoreAttributes.JUMP_STRENGTH.get());
+        AttributeInstance instance = entity.getAttribute(attributeHolder);
         if (instance == null) return fallDistance;
 
         float additionalJumpBlock = (float) ((instance.getValue() - 0.42F) / 0.1F);
@@ -44,7 +49,8 @@ public abstract class MixinLivingEntity {
     @Inject(method = "jumpInLiquid", at = @At("HEAD"))
     protected void jumpInLiquid(TagKey<Fluid> fluidTag, CallbackInfo ci) {
         LivingEntity entity = (LivingEntity) (Object) this;
-        AttributeInstance instance = entity.getAttribute(ManasCoreAttributes.SWIM_SPEED_ADDITION.get());
+        Holder<Attribute> attributeHolder = Holder.direct(ManasCoreAttributes.SWIM_SPEED_ADDITION.get());
+        AttributeInstance instance = entity.getAttribute(attributeHolder);
         if (instance == null) return;
         entity.setDeltaMovement(entity.getDeltaMovement().add(0.0, 0.04 * instance.getValue() - 0.04, 0.0));
     }
@@ -52,7 +58,8 @@ public abstract class MixinLivingEntity {
     @Inject(method = "goDownInWater", at = @At("HEAD"))
     protected void goDownInWater(CallbackInfo ci) {
         LivingEntity entity = (LivingEntity) (Object) this;
-        AttributeInstance instance = entity.getAttribute(ManasCoreAttributes.SWIM_SPEED_ADDITION.get());
+        Holder<Attribute> attributeHolder = Holder.direct(ManasCoreAttributes.SWIM_SPEED_ADDITION.get());
+        AttributeInstance instance = entity.getAttribute(attributeHolder);
         if (instance == null) return;
         entity.setDeltaMovement(entity.getDeltaMovement().add(0.0, 0.04 - 0.04 * instance.getValue(), 0.0));
     }
@@ -61,7 +68,8 @@ public abstract class MixinLivingEntity {
             target = "Lnet/minecraft/world/entity/LivingEntity;moveRelative(FLnet/minecraft/world/phys/Vec3;)V", ordinal = 0))
     public float travel(float speed) {
         LivingEntity entity = (LivingEntity) (Object) this;
-        AttributeInstance instance = entity.getAttribute(ManasCoreAttributes.SWIM_SPEED_ADDITION.get());
+        Holder<Attribute> attributeHolder = Holder.direct(ManasCoreAttributes.SWIM_SPEED_ADDITION.get());
+        AttributeInstance instance = entity.getAttribute(attributeHolder);
         if (instance == null) return speed;
         return (float) (speed * instance.getValue());
     }
