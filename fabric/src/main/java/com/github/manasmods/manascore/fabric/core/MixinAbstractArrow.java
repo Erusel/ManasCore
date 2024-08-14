@@ -39,34 +39,25 @@ public abstract class MixinAbstractArrow extends Projectile {
     private final IntOpenHashSet ignoredEntities = new IntOpenHashSet();
 
     @WrapMethod(method = "onHitEntity")
-    void onHit(EntityHitResult result, Operation<Void> original, @Local LocalRef<EntityHitResult> entityHitResult) {
+    void onHit(EntityHitResult entityHitResult, Operation<Void> original) {
         Changeable<ProjectileHitResult> resultChangeable = Changeable.of(ProjectileHitResult.DEFAULT);
-        EntityEvents.PROJECTILE_HIT.invoker().hit(result, this, resultChangeable);
+        EntityEvents.PROJECTILE_HIT.invoker().hit(entityHitResult, this, resultChangeable);
         this.onHitEventResult = resultChangeable.get();
 
         switch (this.onHitEventResult) {
-            case DEFAULT -> {
-                original.call(result);
+            case DEFAULT, PASS -> {
+                original.call(entityHitResult);
                 this.onHitEventResult = null;
             }
             case HIT -> {
                 this.setPierceLevel((byte) 0);
-                original.call(result);
+                original.call(entityHitResult);
                 this.onHitEventResult = null;
             }
             case HIT_NO_DAMAGE -> {
                 this.discard();
-                entityHitResult.set(null);
             }
-            case PASS -> {
-                if (result.getType() != HitResult.Type.ENTITY) {
-                    original.call(result);
-                    this.onHitEventResult = null;
-                } else {
-                    this.ignoredEntities.add(entityHitResult.get().getEntity().getId());
-                    entityHitResult.set(null);
-                }
-            }
+            case null -> {}
         }
     }
 

@@ -5,16 +5,12 @@
   "compatibilityLevel": "JAVA_17",
   "mixins": [
     "MixinAbstractArrow",
-    "MixinAbstractHurtingProjectile",
+    "MixinProjectile",
     "MixinFireRocketEntity",
-    "MixinFishingHook",
     "MixinLivingEntity",
-    "MixinLlamaSpit",
     "MixinMob",
     "MixinPlayer",
-    "MixinShulkerBullet",
-    "MixinStartAttacking",
-    "MixinThrowableProjectile"
+    "MixinStartAttacking"
   ],
   "injectors": {
     "defaultRequire": 1

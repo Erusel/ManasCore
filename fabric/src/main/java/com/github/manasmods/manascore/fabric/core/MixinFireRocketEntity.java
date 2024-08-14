@@ -23,7 +23,8 @@ public abstract class MixinFireRocketEntity extends Projectile {
     @Unique
     @Nullable
     private ProjectileHitResult onHitEventResult = null;
-    @WrapOperation(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/projectile/FireworkRocketEntity;onHit(Lnet/minecraft/world/phys/HitResult;)V"))
+    //TODO: This has to be done new for the new changes
+    /*@WrapOperation(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/projectile/FireworkRocketEntity;onHit(Lnet/minecraft/world/phys/HitResult;)V"))
     void onHit(FireworkRocketEntity instance, HitResult result, Operation<Void> original) {
         Changeable<ProjectileHitResult> resultChangeable = Changeable.of(ProjectileHitResult.DEFAULT);
         EntityEvents.PROJECTILE_HIT.invoker().hit(result, instance, resultChangeable);
@@ -42,7 +43,7 @@ public abstract class MixinFireRocketEntity extends Projectile {
                 }
             }
         }
-    }
+    }*/
 
     @WrapOperation(method = "tick", at = @At(value = "FIELD", target = "Lnet/minecraft/world/entity/projectile/FireworkRocketEntity;hasImpulse:Z"))
     void onImpulseSet(FireworkRocketEntity instance, boolean value, Operation<Boolean> original) {
