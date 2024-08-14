@@ -1,6 +1,7 @@
 package com.github.manasmods.manascore.world;
 
 import com.github.manasmods.manascore.storage.CombinedStorage;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.datafix.DataFixTypes;
 import net.minecraft.world.level.saveddata.SavedData;
@@ -11,7 +12,7 @@ public class StoragePersistentState extends SavedData {
     public static Factory<StoragePersistentState> getFactory(CombinedStorage storage) {
         return new Factory<>(
                 () -> new StoragePersistentState(storage),
-                tag -> fromNBT(storage, tag),
+                (tag, holderLookup) -> fromNBT(storage, tag),
                 DataFixTypes.LEVEL
         );
     }
@@ -23,13 +24,13 @@ public class StoragePersistentState extends SavedData {
     }
 
     @Override
-    public boolean isDirty() {
-        return true;
+    public CompoundTag save(CompoundTag tag, HolderLookup.Provider registries) {
+        return this.storage.toNBT();
     }
 
     @Override
-    public CompoundTag save(CompoundTag compoundTag) {
-        return this.storage.toNBT();
+    public boolean isDirty() {
+        return true;
     }
 
     public static StoragePersistentState fromNBT(CombinedStorage storage, CompoundTag tag) {
