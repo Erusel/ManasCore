@@ -203,6 +203,11 @@ public abstract class AbstractRegister<R extends AbstractRegister<R>> {
         public RegistrySupplier<T> end() {
             return this.register.items.register(this.id, () -> this.itemFactory.apply(this.properties));
         }
+
+        @Override
+        public Holder<T> endAsHolder() {
+            return this.end().getRegistrar().getHolder(this.id);
+        }
     }
 
     /**
@@ -250,6 +255,11 @@ public abstract class AbstractRegister<R extends AbstractRegister<R>> {
             if (this.parentBlockRegistryEntry == null) throw new IllegalStateException("Parent block registry entry must not be null!");
             return this.register.items.register(this.id, () -> this.itemFactory.apply(this.parentBlockRegistryEntry, this.properties));
         }
+
+        @Override
+        public Holder<T> endAsHolder() {
+            return this.end().getRegistrar().getHolder(this.id);
+        }
     }
 
     /**
@@ -293,6 +303,11 @@ public abstract class AbstractRegister<R extends AbstractRegister<R>> {
             this.blockItemBuilder.setParentBlockRegistryEntry(blockSupplier);
             this.blockItemBuilder.end();
             return blockSupplier;
+        }
+
+        @Override
+        public Holder<T> endAsHolder() {
+            return this.end().getRegistrar().getHolder(this.id);
         }
 
         @FunctionalInterface
@@ -400,6 +415,11 @@ public abstract class AbstractRegister<R extends AbstractRegister<R>> {
 
             supplier.listen(type -> ManasAttributeRegistry.registerNew(() -> type, this.attributeBuilder));
             return supplier;
+        }
+
+        @Override
+        public Holder<EntityType<T>> endAsHolder() {
+            return this.end().getRegistrar().getHolder(this.id);
         }
     }
 
@@ -530,6 +550,10 @@ public abstract class AbstractRegister<R extends AbstractRegister<R>> {
 
             return supplier;
         }
+
+        public Holder<RangedAttribute> endAsHolder() {
+            return this.end().getRegistrar().getHolder(this.id);
+        }
     }
 
 
@@ -569,6 +593,11 @@ public abstract class AbstractRegister<R extends AbstractRegister<R>> {
         public RegistrySupplier<BlockEntityType<T>> end() {
             return this.register.blockEntities.register(this.id, () -> BlockEntityType.Builder.of(this.factory, this.validBlocks.stream().map(Supplier::get).toArray(Block[]::new)).build(this.dataFixerType));
         }
+
+        @Override
+        public Holder<BlockEntityType<T>> endAsHolder() {
+            return this.end().getRegistrar().getHolder(this.id);
+        }
     }
 
     public static class SkillBuilder<R extends AbstractRegister<R>, T extends ManasSkill> extends ContentBuilder<T, R> {
@@ -582,6 +611,11 @@ public abstract class AbstractRegister<R extends AbstractRegister<R>> {
         @Override
         public RegistrySupplier<T> end() {
             return this.register.skills.register(this.id, this.skillFactory);
+        }
+
+        @Override
+        public Holder<T> endAsHolder() {
+            return this.end().getRegistrar().getHolder(this.id);
         }
     }
 
@@ -604,5 +638,6 @@ public abstract class AbstractRegister<R extends AbstractRegister<R>> {
         }
 
         public abstract RegistrySupplier<T> end();
+        public abstract Holder<T> endAsHolder();
     }
 }
