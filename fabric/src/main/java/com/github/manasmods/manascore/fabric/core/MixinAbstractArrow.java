@@ -3,6 +3,7 @@ package com.github.manasmods.manascore.fabric.core;
 import com.github.manasmods.manascore.api.world.entity.EntityEvents;
 import com.github.manasmods.manascore.api.world.entity.EntityEvents.ProjectileHitResult;
 import com.github.manasmods.manascore.utils.Changeable;
+import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
@@ -37,20 +38,20 @@ public abstract class MixinAbstractArrow extends Projectile {
     private ProjectileHitResult onHitEventResult = null;
     private final IntOpenHashSet ignoredEntities = new IntOpenHashSet();
 
-    @WrapOperation(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/projectile/AbstractArrow;onHit(Lnet/minecraft/world/phys/HitResult;)V"))
-    void onHit(AbstractArrow instance, HitResult result, Operation<Void> original, @Local LocalRef<EntityHitResult> entityHitResult) {
+    @WrapMethod(method = "onHitEntity")
+    void onHit(EntityHitResult result, Operation<Void> original, @Local LocalRef<EntityHitResult> entityHitResult) {
         Changeable<ProjectileHitResult> resultChangeable = Changeable.of(ProjectileHitResult.DEFAULT);
-        EntityEvents.PROJECTILE_HIT.invoker().hit(result, instance, resultChangeable);
+        EntityEvents.PROJECTILE_HIT.invoker().hit(result, this, resultChangeable);
         this.onHitEventResult = resultChangeable.get();
 
         switch (this.onHitEventResult) {
             case DEFAULT -> {
-                original.call(instance, result);
+                original.call(result);
                 this.onHitEventResult = null;
             }
             case HIT -> {
                 this.setPierceLevel((byte) 0);
-                original.call(instance, result);
+                original.call(result);
                 this.onHitEventResult = null;
             }
             case HIT_NO_DAMAGE -> {
@@ -59,7 +60,7 @@ public abstract class MixinAbstractArrow extends Projectile {
             }
             case PASS -> {
                 if (result.getType() != HitResult.Type.ENTITY) {
-                    original.call(instance, result);
+                    original.call(result);
                     this.onHitEventResult = null;
                 } else {
                     this.ignoredEntities.add(entityHitResult.get().getEntity().getId());
