@@ -425,14 +425,14 @@ public abstract class AbstractRegister<R extends AbstractRegister<R>> {
         protected double maximumValue;
 
         protected boolean syncable;
-        protected Map<Supplier<EntityType<? extends LivingEntity>>, Double> applicableEntityTypes;
+        protected Map<Supplier<EntityType<? extends Entity>>, Double> applicableEntityTypes;
         protected boolean applyToAll = false;
 
         private AttributeBuilder(R register, String name) {
             super(register, name);
             this.defaultValue = 1;
             this.minimumValue = 0;
-            this.maximumValue = 1_000_000;
+            this.maximumValue = 100_000_000_000D;
             this.syncable = false;
             this.applicableEntityTypes = new HashMap<>();
         }
@@ -472,7 +472,7 @@ public abstract class AbstractRegister<R extends AbstractRegister<R>> {
         /**
          * Applies the attribute to all given entities with the default value.
          */
-        public AttributeBuilder<R> applyTo(double defaultValue, Supplier<EntityType<? extends LivingEntity>> entityType) {
+        public AttributeBuilder<R> applyTo(double defaultValue, Supplier<EntityType<? extends Entity>> entityType) {
             this.applicableEntityTypes.put(entityType, defaultValue);
             return this;
         }
@@ -480,7 +480,7 @@ public abstract class AbstractRegister<R extends AbstractRegister<R>> {
         /**
          * Applies the attribute to all given entities with the default value.
          */
-        public AttributeBuilder<R> applyTo(Supplier<EntityType<? extends LivingEntity>> entityType) {
+        public AttributeBuilder<R> applyTo(Supplier<EntityType<? extends Entity>> entityType) {
             return applyTo(this.defaultValue, entityType);
         }
 
@@ -488,8 +488,8 @@ public abstract class AbstractRegister<R extends AbstractRegister<R>> {
          * Applies the attribute to all given entities with the default value.
          */
         @SafeVarargs
-        public final AttributeBuilder<R> applyTo(double defaultValue, Supplier<EntityType<? extends LivingEntity>>... entityType) {
-            for (Supplier<EntityType<? extends LivingEntity>> typeSupplier : entityType) {
+        public final AttributeBuilder<R> applyTo(double defaultValue, Supplier<EntityType<? extends Entity>>... entityType) {
+            for (Supplier<EntityType<? extends Entity>> typeSupplier : entityType) {
                 this.applicableEntityTypes.put(typeSupplier, defaultValue);
             }
             return this;
@@ -499,15 +499,15 @@ public abstract class AbstractRegister<R extends AbstractRegister<R>> {
          * Applies the attribute to all given entities with the default value.
          */
         @SafeVarargs
-        public final AttributeBuilder<R> applyTo(Supplier<EntityType<? extends LivingEntity>>... entityType) {
+        public final AttributeBuilder<R> applyTo(Supplier<EntityType<? extends Entity>>... entityType) {
             return applyTo(this.defaultValue, entityType);
         }
 
         /**
          * Applies the attribute to all given entities with the default value.
          */
-        public AttributeBuilder<R> applyTo(double defaultValue, List<Supplier<EntityType<? extends LivingEntity>>> entityTypes) {
-            for (Supplier<EntityType<? extends LivingEntity>> typeSupplier : entityTypes) {
+        public AttributeBuilder<R> applyTo(double defaultValue, List<Supplier<EntityType<? extends Entity>>> entityTypes) {
+            for (Supplier<EntityType<? extends Entity>> typeSupplier : entityTypes) {
                 this.applicableEntityTypes.put(typeSupplier, defaultValue);
             }
             return this;
@@ -516,7 +516,7 @@ public abstract class AbstractRegister<R extends AbstractRegister<R>> {
         /**
          * Applies the attribute to all given entities with the default value.
          */
-        public AttributeBuilder<R> applyTo(List<Supplier<EntityType<? extends LivingEntity>>> entityTypes) {
+        public AttributeBuilder<R> applyTo(List<Supplier<EntityType<? extends Entity>>> entityTypes) {
             return applyTo(this.defaultValue, entityTypes);
         }
 
@@ -537,8 +537,12 @@ public abstract class AbstractRegister<R extends AbstractRegister<R>> {
             Holder<Attribute> holder = Registry.registerForHolder(BuiltInRegistries.ATTRIBUTE, this.id, attribute);
             RegistrySupplier<Attribute> supplier = this.register.attributes.register(this.id, () -> attribute);
 
-            if (this.applyToAll) ManasAttributeRegistry.registerToAll(builder -> builder.add(holder, this.defaultValue));
-            this.applicableEntityTypes.forEach((typeSupplier, defaultValue) -> ManasAttributeRegistry.register(typeSupplier, builder -> builder.add(holder, defaultValue)));
+            if (this.applyToAll) { //registerToAll doesn't work
+                //ManasAttributeRegistry.registerToAll(builder -> builder.add(holder, this.defaultValue));
+                BuiltInRegistries.ENTITY_TYPE.stream().forEach(type ->
+                        ManasAttributeRegistry.register(() -> type, builder -> builder.add(holder, defaultValue)));
+            } else this.applicableEntityTypes.forEach((typeSupplier, defaultValue) ->
+                    ManasAttributeRegistry.register(typeSupplier, builder -> builder.add(holder, defaultValue)));
             return supplier;
         }
 

@@ -1,10 +1,13 @@
 package com.github.manasmods.manascore.api.skill;
 
+import com.github.manasmods.manascore.ManasCore;
 import com.github.manasmods.manascore.api.world.entity.EntityEvents.ProjectileHitResult;
 import com.github.manasmods.manascore.utils.Changeable;
+import com.google.common.collect.Maps;
 import lombok.Getter;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
@@ -12,17 +15,22 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.phys.EntityHitResult;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Map;
 import java.util.Objects;
 
 @SuppressWarnings("unused")
 public class ManasSkill {
     @Getter
     private final SkillRarity rarity;
+    protected final Map<Holder<Attribute>, AttributeModifier> onHeldAttributeModifiers = Maps.newHashMap();
 
     public ManasSkill(final SkillRarity rarity) {
         this.rarity = rarity;
@@ -97,7 +105,7 @@ public class ManasSkill {
      * @return the maximum number of ticks that this skill can be held down with the skill activation button.
      * </p>
      */
-    public int getMaxHeldTime() {
+    public int getMaxHeldTime(ManasSkillInstance instance , LivingEntity entity) {
         return 72000;
     }
 
@@ -162,6 +170,58 @@ public class ManasSkill {
         if (isMastered(instance, entity)) return;
         instance.setMastery(instance.getMastery() + 1);
         if (isMastered(instance, entity)) instance.onSkillMastered(entity);
+    }
+
+    /**
+     * Adds an attribute modifier to this skill. This method can be called for more than one attribute.
+     * The attributes are applied to an entity when the skill is held and removed when it stops being held.
+     * </p>
+     */
+    public void addHeldAttributeModifier(Holder<Attribute> pAttribute, String id, double pAmount, AttributeModifier.Operation pOperation) {
+        ResourceLocation name = ResourceLocation.fromNamespaceAndPath(ManasCore.MOD_ID, id + "." + pAttribute.value().getDescriptionId());
+        AttributeModifier attributemodifier = new AttributeModifier(name, pAmount, pOperation);
+        this.onHeldAttributeModifiers.put(pAttribute, attributemodifier);
+    }
+
+    /**
+     * @return the amplifier for each attribute modifier that this skill applies.
+     * </p>
+     * @param entity   Affected {@link LivingEntity} owning this Skill.
+     * @param instance Affected {@link ManasSkillInstance}
+     * @param modifier Affected {@link AttributeModifier} that this skill provides.
+     */
+    public double getAttributeModifierAmplifier(ManasSkillInstance instance, LivingEntity entity, AttributeModifier modifier) {
+        return modifier.amount();
+    }
+
+    /**
+     * Applies the attribute modifiers of this skill on the {@link LivingEntity} holding the skill activation button.
+     *
+     * @param entity   Affected {@link LivingEntity} owning this Skill.
+     * @param instance Affected {@link ManasSkillInstance}
+     */
+    public void addHeldAttributeModifiers(ManasSkillInstance instance, LivingEntity entity) {
+        for (Map.Entry<Holder<Attribute>, AttributeModifier> entry : this.onHeldAttributeModifiers.entrySet()) {
+            AttributeInstance attribute = entity.getAttribute(entry.getKey());
+            if (attribute != null) {
+                AttributeModifier modifier = entry.getValue();
+                attribute.removeModifier(modifier.id());
+                attribute.addPermanentModifier(new AttributeModifier(modifier.id(),
+                        instance.getAttributeModifierAmplifier(entity, modifier), modifier.operation()));
+            }
+        }
+    }
+
+    /**
+     * Removes the attribute modifiers of this skill from the {@link LivingEntity} holding the skill activation button.
+     *
+     * @param entity   Affected {@link LivingEntity} owning this Skill.
+     */
+    public void removeHeldAttributeModifiers(LivingEntity entity) {
+        for (Map.Entry<Holder<Attribute>, AttributeModifier> entry : this.onHeldAttributeModifiers.entrySet()) {
+            AttributeInstance attribute = entity.getAttribute(entry.getKey());
+            if (attribute != null) attribute.removeModifier(entry.getValue().id());
+        }
     }
 
     /**

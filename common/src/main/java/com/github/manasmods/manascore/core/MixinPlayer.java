@@ -1,10 +1,12 @@
 package com.github.manasmods.manascore.core;
 
 import com.github.manasmods.manascore.api.world.entity.EntityEvents;
+import com.github.manasmods.manascore.attribute.ManasCoreAttributeUtils;
 import com.github.manasmods.manascore.attribute.ManasCoreAttributes;
 import com.github.manasmods.manascore.utils.Changeable;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.player.Player;
@@ -16,12 +18,14 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class MixinPlayer {
     @ModifyArg(method = "attack", at = @At(value = "INVOKE",
             target = "Lnet/minecraft/world/entity/Entity;hurt(Lnet/minecraft/world/damagesource/DamageSource;F)Z"), index = 1)
-    private float getCritChanceDamage(float amount, @Local(ordinal = 1) float g, @Local(ordinal = 2) boolean bl3) {
+    private float getCritChanceDamage(float amount, @Local(ordinal = 0, argsOnly = true) Entity target,
+                                      @Local(ordinal = 1) float g, @Local(ordinal = 2) boolean bl3) {
         Player player = (Player) (Object) this;
         if (!bl3) {
             AttributeInstance instance = player.getAttribute(ManasCoreAttributes.CRIT_CHANCE);
             if (instance == null || player.getRandom().nextInt(100) > instance.getValue()) return amount;
             float beforeEnchant = amount - g;
+            ManasCoreAttributeUtils.triggerCriticalAttackEffect(target, player);
             return beforeEnchant * getCritMultiplier(1.5F) + g;
         }
         return amount;

@@ -1,7 +1,9 @@
 package com.github.manasmods.manascore.attribute;
 
 import lombok.experimental.UtilityClass;
+import net.minecraft.network.protocol.game.ClientboundAnimatePacket;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
@@ -36,6 +38,13 @@ public class ManasCoreAttributeUtils {
         if (target != null && source != null && attacker.level() instanceof ServerLevel serverLevel)
             damage = EnchantmentHelper.modifyDamage(serverLevel, attacker.getWeaponItem(), target, source, damage);
         return damage;
+    }
+
+    public static void triggerCriticalAttackEffect(Entity target, Entity attacker) {
+        target.level().playSound(null, target.getX(), target.getY(), target.getZ(),
+                SoundEvents.PLAYER_ATTACK_CRIT, attacker.getSoundSource(), 1.0F, 1.0F);
+        if (target.level() instanceof ServerLevel level)
+            level.getChunkSource().broadcastAndSend(target, new ClientboundAnimatePacket(target, 4));
     }
 
     public static Vec3 getLookTowardVec(Player player, double distance) {

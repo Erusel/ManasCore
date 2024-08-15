@@ -15,9 +15,11 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.phys.EntityHitResult;
@@ -51,6 +53,10 @@ public class ManasSkillInstance {
 
     public ResourceLocation getSkillId() {
         return this.skillRegistryObject.getId();
+    }
+
+    public boolean is(TagKey<ManasSkill> tag) {
+        return this.skillRegistryObject.is(tag);
     }
 
     /**
@@ -164,8 +170,8 @@ public class ManasSkillInstance {
      * @return the maximum number of ticks that this skill can be held down with the skill activation button.
      * </p>
      */
-    public int getMaxHeldTime() {
-        return this.getSkill().getMaxHeldTime();
+    public int getMaxHeldTime(LivingEntity entity) {
+        return this.getSkill().getMaxHeldTime(this, entity);
     }
 
     /**
@@ -360,6 +366,25 @@ public class ManasSkillInstance {
     public void setTag(@Nullable CompoundTag tag) {
         this.tag = tag;
         markDirty();
+    }
+
+    /**
+     * @return the amplifier for each attribute modifier that this instance applies.
+     * </p>
+     * @param entity   Affected {@link LivingEntity} owning this Skill.
+     * @param modifier Affected {@link AttributeModifier} that this skill provides.
+     */
+    public double getAttributeModifierAmplifier(LivingEntity entity, AttributeModifier modifier) {
+        return this.getSkill().getAttributeModifierAmplifier(this, entity, modifier);
+    }
+
+    /**
+     * Applies the attribute modifiers of this instance on the {@link LivingEntity} holding the skill activation button.
+     *
+     * @param entity   Affected {@link LivingEntity} owning this Skill.
+     */
+    public void addHeldAttributeModifiers(LivingEntity entity) {
+        this.getSkill().addHeldAttributeModifiers(this, entity);
     }
 
     /**
