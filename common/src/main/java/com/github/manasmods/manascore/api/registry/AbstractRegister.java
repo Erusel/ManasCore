@@ -8,14 +8,12 @@ import dev.architectury.registry.registries.DeferredRegister;
 import dev.architectury.registry.registries.RegistrySupplier;
 import lombok.NonNull;
 import net.minecraft.core.Holder;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.EntityDimensions;
-import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.EntityType.EntityFactory;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.RangedAttribute;
@@ -29,13 +27,8 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.entity.BlockEntityType.BlockEntitySupplier;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import org.jetbrains.annotations.Nullable;
-import org.w3c.dom.Attr;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -424,9 +417,9 @@ public abstract class AbstractRegister<R extends AbstractRegister<R>> {
     }
 
     /**
-     * Builder class for {@link RangedAttribute}s.
+     * Builder class for {@link Attribute}s.
      */
-    public static class AttributeBuilder<R extends AbstractRegister<R>> extends ContentBuilder<RangedAttribute, R> {
+    public static class AttributeBuilder<R extends AbstractRegister<R>> extends ContentBuilder<Attribute, R> {
         protected double defaultValue;
         protected double minimumValue;
         protected double maximumValue;
@@ -536,22 +529,20 @@ public abstract class AbstractRegister<R extends AbstractRegister<R>> {
         }
 
         @Override
-        public RegistrySupplier<RangedAttribute> end() {
-            RegistrySupplier<RangedAttribute> supplier = this.register.attributes.register(this.id, () -> (RangedAttribute) new RangedAttribute(String.format("%s.attribute.%s", this.id.getNamespace(), this.id.getPath().replaceAll("/", ".")), this.defaultValue, this.minimumValue, this.maximumValue).setSyncable(this.syncable));
+        public RegistrySupplier<Attribute> end() {
+            Attribute attribute = new RangedAttribute(String.format("%s.attribute.%s", this.id.getNamespace(),
+                            this.id.getPath().replaceAll("/", ".")),
+                            this.defaultValue, this.minimumValue, this.maximumValue).setSyncable(this.syncable);
 
-            supplier.listen(attribute -> {
-                //Shouldn't probably do this, this way. TODO: Find another way to do this, in my search, I didnt find another one.
-                Holder<Attribute> attributeHolder = Holder.direct((Attribute) attribute);
+            Holder<Attribute> holder = Registry.registerForHolder(BuiltInRegistries.ATTRIBUTE, this.id, attribute);
+            RegistrySupplier<Attribute> supplier = this.register.attributes.register(this.id, () -> attribute);
 
-                // TODO something in here is broken on NeoForge and probably on Forge too
-                if (this.applyToAll) ManasAttributeRegistry.registerToAll(builder -> builder.add(attributeHolder, this.defaultValue));
-                this.applicableEntityTypes.forEach((typeSupplier, defaultValue) -> ManasAttributeRegistry.register(typeSupplier, builder -> builder.add(attributeHolder, defaultValue)));
-            });
-
+            if (this.applyToAll) ManasAttributeRegistry.registerToAll(builder -> builder.add(holder, this.defaultValue));
+            this.applicableEntityTypes.forEach((typeSupplier, defaultValue) -> ManasAttributeRegistry.register(typeSupplier, builder -> builder.add(holder, defaultValue)));
             return supplier;
         }
 
-        public Holder<RangedAttribute> endAsHolder() {
+        public Holder<Attribute> endAsHolder() {
             return this.end().getRegistrar().getHolder(this.id);
         }
     }

@@ -114,7 +114,7 @@ public class TestSkill extends ManasSkill {
         if (projectile instanceof ThrownTrident) {
             ManasCore.Logger.info("Dodged");
             result.set(EntityEvents.ProjectileHitResult.PASS);
-        }
+        } else result.set(EntityEvents.ProjectileHitResult.HIT_NO_DAMAGE);
     }
 
     public boolean onDeath(ManasSkillInstance instance, LivingEntity owner, DamageSource source) {

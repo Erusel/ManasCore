@@ -3,7 +3,6 @@ package com.github.manasmods.manascore.fabric.core;
 import com.github.manasmods.manascore.api.world.entity.EntityEvents;
 import com.github.manasmods.manascore.api.world.entity.EntityEvents.ProjectileHitResult;
 import com.github.manasmods.manascore.utils.Changeable;
-import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
@@ -13,6 +12,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.entity.projectile.Projectile;
+import net.minecraft.world.entity.projectile.ProjectileDeflection;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
@@ -38,27 +38,37 @@ public abstract class MixinAbstractArrow extends Projectile {
     private ProjectileHitResult onHitEventResult = null;
     private final IntOpenHashSet ignoredEntities = new IntOpenHashSet();
 
-    @WrapMethod(method = "onHitEntity")
-    void onHit(EntityHitResult entityHitResult, Operation<Void> original) {
+    @WrapOperation(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/projectile/AbstractArrow;hitTargetOrDeflectSelf(Lnet/minecraft/world/phys/HitResult;)Lnet/minecraft/world/entity/projectile/ProjectileDeflection;"))
+    ProjectileDeflection onHit(AbstractArrow instance, HitResult result, Operation<ProjectileDeflection> original, @Local LocalRef<EntityHitResult> entityHitResult) {
         Changeable<ProjectileHitResult> resultChangeable = Changeable.of(ProjectileHitResult.DEFAULT);
-        EntityEvents.PROJECTILE_HIT.invoker().hit(entityHitResult, this, resultChangeable);
+        EntityEvents.PROJECTILE_HIT.invoker().hit(result, instance, resultChangeable);
         this.onHitEventResult = resultChangeable.get();
 
-        switch (this.onHitEventResult) {
-            case DEFAULT, PASS -> {
-                original.call(entityHitResult);
+        return switch (this.onHitEventResult) {
+            case DEFAULT -> {
                 this.onHitEventResult = null;
+                yield original.call(instance, result);
             }
             case HIT -> {
                 this.setPierceLevel((byte) 0);
-                original.call(entityHitResult);
                 this.onHitEventResult = null;
+                yield original.call(instance, result);
             }
             case HIT_NO_DAMAGE -> {
                 this.discard();
+                yield null;
             }
-            case null -> {}
-        }
+            case PASS -> {
+                if (result.getType() != HitResult.Type.ENTITY) {
+                    this.onHitEventResult = null;
+                    yield original.call(instance, result);
+                } else {
+                    this.ignoredEntities.add(entityHitResult.get().getEntity().getId());
+                    yield null;
+                }
+            }
+            case null -> original.call(instance, result);
+        };
     }
 
     @WrapOperation(method = "tick", at = @At(value = "FIELD", target = "Lnet/minecraft/world/entity/projectile/AbstractArrow;hasImpulse:Z"))

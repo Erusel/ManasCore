@@ -4,13 +4,13 @@ import com.github.manasmods.manascore.api.world.entity.EntityEvents;
 import com.github.manasmods.manascore.utils.Changeable;
 import net.minecraft.world.entity.LivingEntity;
 import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.common.damagesource.DamageContainer;
 import net.neoforged.neoforge.event.entity.ProjectileImpactEvent;
 import net.neoforged.neoforge.event.entity.living.LivingChangeTargetEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
-import net.neoforged.neoforge.event.entity.living.LivingHurtEvent;
 
-@Mod.EventBusSubscriber
+@EventBusSubscriber
 public class NeoForgeCommonEventInvoker {
     private NeoForgeCommonEventInvoker() {
     }
@@ -26,23 +26,12 @@ public class NeoForgeCommonEventInvoker {
     }
 
     @SubscribeEvent
-    static void onLivingHurt(final LivingHurtEvent e) {
-        Changeable<Float> amount = Changeable.of(e.getAmount());
-        if (EntityEvents.LIVING_HURT.invoker().hurt(e.getEntity(), e.getSource(), amount).isFalse()) {
-            e.setCanceled(true);
-        } else {
-            e.setAmount(amount.get());
-        }
-    }
-
-    @SubscribeEvent
-    static void onLivingDamage(final LivingDamageEvent e) {
-        Changeable<Float> amount = Changeable.of(e.getAmount());
-        if (EntityEvents.LIVING_DAMAGE.invoker().damage(e.getEntity(), e.getSource(), amount).isFalse()) {
-            e.setCanceled(true);
-        } else {
-            e.setAmount(amount.get());
-        }
+    static void onLivingDamage(final LivingDamageEvent.Pre e) {
+        DamageContainer container = e.getContainer();
+        Changeable<Float> amount = Changeable.of(container.getNewDamage());
+        if (EntityEvents.LIVING_DAMAGE.invoker().damage(e.getEntity(), container.getSource(), amount).isFalse()) {
+            container.setNewDamage(0);
+        } else container.setNewDamage(amount.get());
     }
 
     @SubscribeEvent

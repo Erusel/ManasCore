@@ -1,10 +1,7 @@
 package com.github.manasmods.manascore.skill;
 
 import com.github.manasmods.manascore.ManasCore;
-import com.github.manasmods.manascore.api.skill.ManasSkill;
-import com.github.manasmods.manascore.api.skill.ManasSkillInstance;
-import com.github.manasmods.manascore.api.skill.SkillAPI;
-import com.github.manasmods.manascore.api.skill.SkillEvents;
+import com.github.manasmods.manascore.api.skill.*;
 import com.github.manasmods.manascore.api.world.entity.EntityEvents;
 import dev.architectury.event.EventResult;
 import dev.architectury.event.events.common.EntityEvent;
@@ -18,6 +15,9 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.EntityHitResult;
 
+import java.util.List;
+import java.util.Optional;
+
 public class SkillRegistry {
     private static final ResourceLocation registryId = ResourceLocation.fromNamespaceAndPath(ManasCore.MOD_ID, "skills");
     public static final Registrar<ManasSkill> SKILLS = RegistrarManager.get(ManasCore.MOD_ID).<ManasSkill>builder(registryId)
@@ -29,30 +29,44 @@ public class SkillRegistry {
     public static void init() {
         InteractionEvent.RIGHT_CLICK_BLOCK.register((player, hand, pos, face) -> {
             if (player.level().isClientSide()) return EventResult.pass();
-            SkillAPI.getSkillsFrom(player).forEachSkill(((storage, skillInstance) -> {
-                if (!skillInstance.canInteractSkill(player)) return;
-                skillInstance.onRightClickBlock(player, hand, pos, face);
-            }));
+            Skills storage = SkillAPI.getSkillsFrom(player);
+
+            for (ManasSkillInstance instance : List.copyOf(storage.getLearnedSkills())) {
+                Optional<ManasSkillInstance> optional = storage.getSkill(instance.getSkill());
+                if (optional.isEmpty()) continue;
+
+                if (!optional.get().canInteractSkill(player)) continue;
+                optional.get().onRightClickBlock(player, hand, pos, face);
+            }
 
             return EventResult.pass();
         });
 
         EntityEvents.LIVING_CHANGE_TARGET.register((entity, changeableTarget) -> {
-            if (!changeableTarget.isPresent()) return EventResult.pass();
-
             LivingEntity owner = changeableTarget.get();
-            for (ManasSkillInstance instance : SkillAPI.getSkillsFrom(owner).getLearnedSkills()) {
-                if (!instance.canInteractSkill(owner)) continue;
-                if (!instance.onBeingTargeted(changeableTarget, entity)) return EventResult.interruptFalse();
+            if (owner == null) return EventResult.pass();
+
+            Skills storage = SkillAPI.getSkillsFrom(owner);
+            for (ManasSkillInstance instance : List.copyOf(storage.getLearnedSkills())) {
+                Optional<ManasSkillInstance> optional = storage.getSkill(instance.getSkill());
+                if (optional.isEmpty()) continue;
+
+                if (!optional.get().canInteractSkill(owner)) continue;
+                if (!optional.get().onBeingTargeted(changeableTarget, entity)) return EventResult.interruptFalse();
             }
 
             return EventResult.pass();
         });
 
         EntityEvents.LIVING_ATTACK.register((entity, source, amount) -> {
-            for (ManasSkillInstance instance : SkillAPI.getSkillsFrom(entity).getLearnedSkills()) {
-                if (!instance.canInteractSkill(entity)) continue;
-                if (!instance.onBeingDamaged(entity, source, amount)) return EventResult.interruptFalse();
+            Skills storage = SkillAPI.getSkillsFrom(entity);
+
+            for (ManasSkillInstance instance : List.copyOf(storage.getLearnedSkills())) {
+                Optional<ManasSkillInstance> optional = storage.getSkill(instance.getSkill());
+                if (optional.isEmpty()) continue;
+
+                if (!optional.get().canInteractSkill(entity)) continue;
+                if (!optional.get().onBeingDamaged(entity, source, amount)) return EventResult.interruptFalse();
             }
 
             return EventResult.pass();
@@ -61,9 +75,12 @@ public class SkillRegistry {
         SkillEvents.SKILL_DAMAGE_PRE_CALCULATION.register((storage, target, source, amount) -> {
             if (!(source.getEntity() instanceof LivingEntity owner)) return EventResult.pass();
 
-            for (ManasSkillInstance instance : SkillAPI.getSkillsFrom(owner).getLearnedSkills()) {
-                if (!instance.canInteractSkill(owner)) continue;
-                if (!instance.onDamageEntity(owner, target, source, amount)) return EventResult.interruptFalse();
+           for (ManasSkillInstance instance : List.copyOf(storage.getLearnedSkills())) {
+                Optional<ManasSkillInstance> optional = storage.getSkill(instance.getSkill());
+                if (optional.isEmpty()) continue;
+
+                if (!optional.get().canInteractSkill(owner)) continue;
+                if (!optional.get().onDamageEntity(owner, target, source, amount)) return EventResult.interruptFalse();
             }
 
             return EventResult.pass();
@@ -72,46 +89,67 @@ public class SkillRegistry {
         SkillEvents.SKILL_DAMAGE_POST_CALCULATION.register((storage, target, source, amount) -> {
             if (!(source.getEntity() instanceof LivingEntity owner)) return EventResult.pass();
 
-            for (ManasSkillInstance instance : SkillAPI.getSkillsFrom(owner).getLearnedSkills()) {
-                if (!instance.canInteractSkill(owner)) continue;
-                if (!instance.onTouchEntity(owner, target, source, amount)) return EventResult.interruptFalse();
+            for (ManasSkillInstance instance : List.copyOf(storage.getLearnedSkills())) {
+                Optional<ManasSkillInstance> optional = storage.getSkill(instance.getSkill());
+                if (optional.isEmpty()) continue;
+
+                if (!optional.get().canInteractSkill(owner)) continue;
+                if (!optional.get().onTouchEntity(owner, target, source, amount)) return EventResult.interruptFalse();
             }
 
             return EventResult.pass();
         });
 
         EntityEvents.LIVING_DAMAGE.register((entity, source, amount) -> {
-            for (ManasSkillInstance instance : SkillAPI.getSkillsFrom(entity).getLearnedSkills()) {
-                if (!instance.canInteractSkill(entity)) continue;
-                if (!instance.onTakenDamage(entity, source, amount)) return EventResult.interruptFalse();
+            Skills storage = SkillAPI.getSkillsFrom(entity);
+
+            for (ManasSkillInstance instance : List.copyOf(storage.getLearnedSkills())) {
+                Optional<ManasSkillInstance> optional = storage.getSkill(instance.getSkill());
+                if (optional.isEmpty()) continue;
+
+                if (!optional.get().canInteractSkill(entity)) continue;
+                if (!optional.get().onTakenDamage(entity, source, amount)) return EventResult.interruptFalse();
             }
 
             return EventResult.pass();
         });
 
         EntityEvent.LIVING_DEATH.register((entity, source) -> {
-            for (ManasSkillInstance instance : SkillAPI.getSkillsFrom(entity).getLearnedSkills()) {
-                if (!instance.canInteractSkill(entity)) continue;
-                if (!instance.onDeath(entity, source)) return EventResult.interruptFalse();
+            Skills storage = SkillAPI.getSkillsFrom(entity);
+
+            for (ManasSkillInstance instance : List.copyOf(storage.getLearnedSkills())) {
+                Optional<ManasSkillInstance> optional = storage.getSkill(instance.getSkill());
+                if (optional.isEmpty()) continue;
+
+                if (!optional.get().canInteractSkill(entity)) continue;
+                if (!optional.get().onDeath(entity, source)) return EventResult.interruptFalse();
             }
 
             return EventResult.pass();
         });
 
         PlayerEvent.PLAYER_RESPAWN.register((newPlayer, conqueredEnd, removalReason) -> {
-            for (ManasSkillInstance instance : SkillAPI.getSkillsFrom(newPlayer).getLearnedSkills()) {
-                if (!instance.canInteractSkill(newPlayer)) continue;
-                instance.onRespawn(newPlayer, conqueredEnd);
+            Skills storage = SkillAPI.getSkillsFrom(newPlayer);
+            for (ManasSkillInstance instance : List.copyOf(storage.getLearnedSkills())) {
+                Optional<ManasSkillInstance> optional = storage.getSkill(instance.getSkill());
+                if (optional.isEmpty()) continue;
+
+                if (!optional.get().canInteractSkill(newPlayer)) continue;
+                optional.get().onRespawn(newPlayer, conqueredEnd);
             }
         });
 
         EntityEvents.PROJECTILE_HIT.register((result, projectile, hitResultChangeable) -> {
             if (!(result instanceof EntityHitResult hitResult)) return;
             if (!(hitResult.getEntity() instanceof LivingEntity hitEntity)) return;
+            Skills storage = SkillAPI.getSkillsFrom(hitEntity);
 
-            for (ManasSkillInstance instance : SkillAPI.getSkillsFrom(hitEntity).getLearnedSkills()) {
-                if (!instance.canInteractSkill(hitEntity)) continue;
-                instance.onProjectileHit(hitEntity, hitResult, projectile, hitResultChangeable);
+            for (ManasSkillInstance instance : List.copyOf(storage.getLearnedSkills())) {
+                Optional<ManasSkillInstance> optional = storage.getSkill(instance.getSkill());
+                if (optional.isEmpty()) continue;
+
+                if (!optional.get().canInteractSkill(hitEntity)) continue;
+                optional.get().onProjectileHit(hitEntity, hitResult, projectile, hitResultChangeable);
             }
         });
     }

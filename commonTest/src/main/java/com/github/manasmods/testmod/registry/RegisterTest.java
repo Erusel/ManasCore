@@ -11,7 +11,7 @@ import dev.architectury.registry.registries.Registrar;
 import dev.architectury.registry.registries.RegistrySupplier;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.ai.attributes.RangedAttribute;
+import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
@@ -37,12 +37,12 @@ public class RegisterTest {
             .fireImmune()
             .withSize(1, 1)
             .end();
-    private static final RegistrySupplier<RangedAttribute> TEST_ATTRIBUTE = REGISTER.attribute("test_attribute")
+    private static final RegistrySupplier<Attribute> TEST_ATTRIBUTE = REGISTER.attribute("test_attribute")
             .withDefaultValue(69)
             .withMaximumValue(420)
             .applyToAll()
             .end();
-    private static final RegistrySupplier<RangedAttribute> TEST_ENTITY_ATTRIBUTE = REGISTER.attribute("test_player_attribute")
+    private static final RegistrySupplier<Attribute> TEST_ENTITY_ATTRIBUTE = REGISTER.attribute("test_player_attribute")
             .withDefaultValue(5)
             .withMaximumValue(10)
             .applyTo(() -> EntityType.PLAYER)

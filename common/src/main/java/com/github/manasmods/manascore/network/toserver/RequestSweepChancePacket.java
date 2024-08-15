@@ -8,9 +8,9 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.phys.AABB;
 
 import java.util.List;
@@ -34,12 +34,11 @@ public class RequestSweepChancePacket {
 
     private void sweepAttack(Player player) {
         float attack = ManasCoreAttributeUtils.getAttackDamage(player);
-        double radiusAddition = player.isCreative() ? 3 : 1.5F; //TODO Entity Reach Attribute
-        //TODO: Find out what happened to getSweepingDamageRatio
-        float sweepAttack = 1.0F + /*EnchantmentHelper.getSweepingDamageRatio(player)*/ 0.2F * attack;
+        double radiusAddition = player.getAttributeValue(Attributes.ENTITY_INTERACTION_RANGE);
+        float sweepAttack = 1.0F + (float) player.getAttributeValue(Attributes.SWEEPING_DAMAGE_RATIO) * attack;
 
-        AABB sweepArea = player.getBoundingBox().inflate(1.0 + radiusAddition, 0.25, 1.0 + radiusAddition)
-                .move(ManasCoreAttributeUtils.getLookTowardVec(player, 1 + radiusAddition));
+        AABB sweepArea = player.getBoundingBox().inflate(radiusAddition, 0.25, radiusAddition)
+                .move(ManasCoreAttributeUtils.getLookTowardVec(player, radiusAddition));
         List<LivingEntity> list = player.level().getEntitiesOfClass(LivingEntity.class, sweepArea);
         if (list.isEmpty()) return;
 

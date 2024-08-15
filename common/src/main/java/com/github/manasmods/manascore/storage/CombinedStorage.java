@@ -46,7 +46,7 @@ public class CombinedStorage {
             // Get serialized storage data
             CompoundTag entryTag = (CompoundTag) t;
             // Get storage id
-            ResourceLocation id = ResourceLocation.withDefaultNamespace(entryTag.getString(STORAGE_ID_KEY));
+            ResourceLocation id = ResourceLocation.parse(entryTag.getString(STORAGE_ID_KEY));
             // Construct storage
             Storage storage = StorageManager.constructStorageFor(this.holder.manasCore$getStorageType(), id, holder);
             if (storage == null) {
@@ -65,7 +65,7 @@ public class CombinedStorage {
 
         for (Tag e : entriesTag) {
             CompoundTag entryTag = (CompoundTag) e;
-            ResourceLocation id = ResourceLocation.withDefaultNamespace(entryTag.getString(STORAGE_ID_KEY));
+            ResourceLocation id = ResourceLocation.parse(entryTag.getString(STORAGE_ID_KEY));
             Storage storage = this.storages.get(id);
             if (storage == null) {
                 ManasCore.Logger.warn("Failed to find storage for id {}. All information about this storage will be dropped!", id);

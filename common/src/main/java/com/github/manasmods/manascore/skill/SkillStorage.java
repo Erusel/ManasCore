@@ -73,7 +73,7 @@ public class SkillStorage extends Storage implements Skills {
 
     private static void tickSkills(LivingEntity entity, Skills storage) {
         List<ManasSkillInstance> tickingSkills = new ArrayList<>();
-        for (ManasSkillInstance instance : storage.getLearnedSkills()) {
+        for (ManasSkillInstance instance : List.copyOf(storage.getLearnedSkills())) {
             Optional<ManasSkillInstance> optional = storage.getSkill(instance.getSkill());
             if (optional.isEmpty()) continue;
 

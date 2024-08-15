@@ -3,20 +3,15 @@ package com.github.manasmods.manascore.core;
 import com.github.manasmods.manascore.api.storage.Storage;
 import com.github.manasmods.manascore.api.storage.StorageHolder;
 import com.github.manasmods.manascore.api.storage.StorageType;
-import com.github.manasmods.manascore.attribute.ManasCoreAttributes;
 import com.github.manasmods.manascore.storage.CombinedStorage;
 import com.github.manasmods.manascore.storage.StorageManager;
 import com.github.manasmods.manascore.storage.StorageManager.StorageKey;
 import com.github.manasmods.manascore.utils.PlayerLookup;
-import net.minecraft.core.Holder;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.ai.attributes.Attribute;
-import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -97,17 +92,5 @@ public class MixinEntity implements StorageHolder {
         this.level.getProfiler().push("manasCoreSyncCheck");
         if (this.storage.isDirty()) StorageManager.syncTracking((Entity) (Object) this, true);
         this.level.getProfiler().pop();
-    }
-
-    @Inject(method = "maxUpStep", at = @At("RETURN"), cancellable = true)
-    protected void maxUpStep(CallbackInfoReturnable<Float> cir) {
-        Entity entity = (Entity) (Object) this;
-        if (!(entity instanceof LivingEntity living)) return;
-
-        Holder<Attribute> attributeHolder = Holder.direct(ManasCoreAttributes.STEP_HEIGHT_ADDITION.get());
-
-        AttributeInstance instance = living.getAttribute(attributeHolder);
-        if (instance == null) return;
-        cir.setReturnValue((float) (cir.getReturnValue() + instance.getValue()));
     }
 }
