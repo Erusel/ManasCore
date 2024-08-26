@@ -52,9 +52,9 @@ subprojects {
             compileClasspath.extendsFrom common
             runtimeClasspath.extendsFrom common
 
-            if(project.name.endsWith("fabric")) {
+            if (project.name.endsWith("fabric")) {
                 developmentFabric.extendsFrom common
-            } else if(project.name.endsWith("neoforge")) {
+            } else if (project.name.endsWith("neoforge")) {
                 developmentNeoForge.extendsFrom common
             }
 
@@ -66,7 +66,7 @@ subprojects {
     }
 
     repositories {
-        if(project.name.endsWith("neoforge")) {
+        if (project.name.endsWith("neoforge")) {
             maven {
                 name = 'NeoForged'
                 url = 'https://maven.neoforged.net/releases'
@@ -130,4 +130,33 @@ subprojects {
             // retrieving dependencies.
         }
     }
+
+    if (!project.name.endsWith("common")) {
+        processResources {
+            def placeholders = [
+                    version: project.version
+            ]
+
+            placeholders.forEach { key, value ->
+                inputs.property key, value
+            }
+
+            if (project.name.endsWith("neoforge")) {
+                filesMatching('META-INF/neoforge.mods.toml') {
+                    expand placeholders
+                }
+            } else if (project.name.endsWith("fabric")) {
+                filesMatching('fabric.mod.json') {
+                    expand placeholders
+                }
+            }
+        }
+    }
+
+    shadowJar {
+        configurations = [project.configurations.shadowBundle]
+        archiveClassifier = 'dev-shadow'
+    }
+
+
 }
