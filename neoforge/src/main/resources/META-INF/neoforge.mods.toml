@@ -1,0 +1,38 @@
+modLoader = "javafml"
+loaderVersion = "[2,)"
+#issueTrackerURL = ""
+license = "All Rights Reserved"
+
+[[mods]]
+modId = "manascore"
+version = "${version}"
+displayName = "ManasCore"
+authors = "ManasMods"
+description = '''
+Utility and Core Library for Manas Mods
+'''
+#logoFile = ""
+
+[[dependencies.manascore]]
+modId = "neoforge"
+type = "required"
+versionRange = "[21,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.manascore]]
+modId = "minecraft"
+type = "required"
+versionRange = "[1.21.1,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.manascore]]
+modId = "architectury"
+type = "required"
+versionRange = "[13.0.6,)"
+ordering = "AFTER"
+side = "BOTH"
+
+[[mixins]]
+config = "manascore.mixins.json"
