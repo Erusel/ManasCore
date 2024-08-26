@@ -1,4 +1,4 @@
-package com.github.manasmods.manascore;
+package com.github.manasmods.manascore.storage;
 
 public final class Manascore {
     public static final String MOD_ID = "manascore";

@@ -1,4 +1,4 @@
-package com.github.manasmods.manascore.fabric.client;
+package com.github.manasmods.manascore.storage.fabric.client;
 
 import net.fabricmc.api.ClientModInitializer;
 

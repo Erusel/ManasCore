@@ -1,6 +1,6 @@
-package com.github.manasmods.manascore.fabric;
+package com.github.manasmods.manascore.storage.fabric;
 
-import com.github.manasmods.manascore.Manascore;
+import com.github.manasmods.manascore.storage.Manascore;
 import net.fabricmc.api.ModInitializer;
 
 public final class ManascoreFabric implements ModInitializer {
