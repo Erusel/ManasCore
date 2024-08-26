@@ -1,3 +1,0 @@
-remapJar {
-    input.set shadowJar.archiveFile
-}

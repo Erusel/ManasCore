@@ -151,12 +151,14 @@ subprojects {
                 }
             }
         }
+
+        shadowJar {
+            configurations = [project.configurations.shadowBundle]
+            archiveClassifier = 'dev-shadow'
+        }
+
+        remapJar {
+            input.set shadowJar.archiveFile
+        }
     }
-
-    shadowJar {
-        configurations = [project.configurations.shadowBundle]
-        archiveClassifier = 'dev-shadow'
-    }
-
-
 }
