@@ -11,7 +11,7 @@ authors = "ManasMods"
 description = '''
 Utility and Core Library for Manas Mods
 '''
-#logoFile = ""
+logoFile = "icon.jpg"
 
 [[dependencies.${mod_id}]]
     modId = "neoforge"
