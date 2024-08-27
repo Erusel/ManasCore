@@ -11,13 +11,11 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.ChunkPos;
 
-import java.util.function.Supplier;
-
 public record SyncChunkStoragePayload(
         boolean isUpdate,
         ChunkPos chunkPos,
         CompoundTag storageTag
-) implements StorageSyncPacket {
+) implements StorageSyncPayload {
     public static final CustomPacketPayload.Type<SyncChunkStoragePayload> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(ModuleConstants.MOD_ID, "sync_chunk_storage"));
     public static final StreamCodec<FriendlyByteBuf, SyncChunkStoragePayload> STREAM_CODEC = CustomPacketPayload.codec(SyncChunkStoragePayload::encode,SyncChunkStoragePayload::new);
 
@@ -31,8 +29,7 @@ public record SyncChunkStoragePayload(
         buf.writeNbt(storageTag);
     }
 
-    public void handle(Supplier<NetworkManager.PacketContext> contextSupplier) {
-        NetworkManager.PacketContext context = contextSupplier.get();
+    public void handle(NetworkManager.PacketContext context) {
         if (context.getEnvironment() != Env.CLIENT) return;
         context.queue(() -> ClientAccess.handle(this));
     }

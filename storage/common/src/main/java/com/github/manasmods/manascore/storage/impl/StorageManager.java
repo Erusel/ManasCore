@@ -1,7 +1,7 @@
 package com.github.manasmods.manascore.storage.impl;
 
 import com.github.manasmods.manascore.storage.api.*;
-import com.github.manasmods.manascore.storage.impl.network.s2c.StorageSyncPacket;
+import com.github.manasmods.manascore.storage.impl.network.s2c.StorageSyncPayload;
 import com.github.manasmods.manascore.storage.impl.network.s2c.SyncChunkStoragePayload;
 import com.github.manasmods.manascore.storage.impl.network.s2c.SyncEntityStoragePayload;
 import com.github.manasmods.manascore.storage.impl.network.s2c.SyncWorldStoragePayload;
@@ -53,18 +53,14 @@ public final class StorageManager {
     }
 
     public static void syncTracking(StorageHolder source, boolean update) {
-        var packet = createSyncPacket(source, update);
-        NetworkManager.sendToPlayers(source, );
-
-        NetworkManager.CHANNEL.sendToPlayers(source.manasCore$getTrackingPlayers(), createSyncPacket(source, update));
+        NetworkManager.sendToPlayers(source.manasCore$getTrackingPlayers(), createSyncPacket(source,update));
     }
 
     public static void syncTarget(StorageHolder source, ServerPlayer target) {
-        var packet = createSyncPacket(source, false);
-        NetworkManager.CHANNEL.sendToPlayer(target, createSyncPacket(source, false));
+        NetworkManager.sendToPlayer(target, createSyncPacket(source, false));
     }
 
-    private static StorageSyncPacket createSyncPacket(StorageHolder source, boolean update) {
+    private static StorageSyncPayload createSyncPacket(StorageHolder source, boolean update) {
         return switch (source.manasCore$getStorageType()) {
             case ENTITY -> {
                 Entity sourceEntity = (Entity) source;

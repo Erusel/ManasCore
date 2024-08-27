@@ -7,7 +7,6 @@ import net.neoforged.fml.common.Mod;
 @Mod(ModuleConstants.MOD_ID)
 public final class ManasCoreStorageNeoForge {
     public ManasCoreStorageNeoForge() {
-        // Run our common setup.
         ManasCoreStorage.init();
     }
 }

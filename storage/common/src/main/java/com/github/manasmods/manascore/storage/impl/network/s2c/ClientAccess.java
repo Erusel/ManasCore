@@ -40,7 +40,7 @@ class ClientAccess {
         handleUpdatePacket(level, packet);
     }
 
-    static void handleUpdatePacket(StorageHolder holder, StorageSyncPacket packet) {
+    static void handleUpdatePacket(StorageHolder holder, StorageSyncPayload packet) {
         if (packet.isUpdate()) {
             holder.manasCore$getCombinedStorage().handleUpdatePacket(packet.storageTag());
         } else {

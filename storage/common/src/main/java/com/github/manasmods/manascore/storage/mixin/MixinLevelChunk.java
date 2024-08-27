@@ -7,7 +7,6 @@ import com.github.manasmods.manascore.storage.api.StorageKey;
 import com.github.manasmods.manascore.storage.api.StorageType;
 import com.github.manasmods.manascore.storage.impl.CombinedStorage;
 import com.github.manasmods.manascore.storage.impl.StorageManager;
-import com.github.manasmods.manascore.storage.impl.util.PlayerLookup;
 import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;

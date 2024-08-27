@@ -10,13 +10,11 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 
-import java.util.function.Supplier;
-
 public record SyncEntityStoragePayload(
         boolean isUpdate,
         int entityId,
         CompoundTag storageTag
-) implements StorageSyncPacket {
+) implements StorageSyncPayload {
     public static final CustomPacketPayload.Type<SyncEntityStoragePayload> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(ModuleConstants.MOD_ID, "sync_entity_storage"));
     public static final StreamCodec<FriendlyByteBuf, SyncEntityStoragePayload> STREAM_CODEC = CustomPacketPayload.codec(SyncEntityStoragePayload::encode, SyncEntityStoragePayload::new);
 
@@ -30,8 +28,7 @@ public record SyncEntityStoragePayload(
         buf.writeNbt(storageTag);
     }
 
-    public void handle(Supplier<NetworkManager.PacketContext> contextSupplier) {
-        NetworkManager.PacketContext context = contextSupplier.get();
+    public void handle(NetworkManager.PacketContext context) {
         if (context.getEnvironment() != Env.CLIENT) return;
         context.queue(() -> ClientAccess.handle(this));
     }

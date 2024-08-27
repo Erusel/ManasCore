@@ -1,9 +1,9 @@
 package com.github.manasmods.manascore.storage;
 
-public final class ManasCoreStorage {
-    public static final String MOD_ID = "manascore";
+import com.github.manasmods.manascore.storage.impl.network.ManasStorageNetwork;
 
+public final class ManasCoreStorage {
     public static void init() {
-        // Write common init code here.
+        ManasStorageNetwork.init();
     }
 }

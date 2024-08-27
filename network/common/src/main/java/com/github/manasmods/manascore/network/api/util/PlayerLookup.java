@@ -1,6 +1,7 @@
-package com.github.manasmods.manascore.storage.impl.util;
+package com.github.manasmods.manascore.network.api.util;
 
 import lombok.NonNull;
+import lombok.experimental.UtilityClass;
 import net.minecraft.server.level.ChunkMap;
 import net.minecraft.server.level.ServerChunkCache;
 import net.minecraft.server.level.ServerLevel;
@@ -16,7 +17,8 @@ import java.util.Collections;
 import java.util.Deque;
 import java.util.stream.Collectors;
 
-public class PlayerLookup {
+@UtilityClass
+public final class PlayerLookup {
     /**
      * Returns a collection of players tracking the entity.
      */
