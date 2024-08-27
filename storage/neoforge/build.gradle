@@ -1,1 +1,3 @@
-
+loom {
+    accessWidenerPath = project(":storage:common").loom.accessWidenerPath
+}

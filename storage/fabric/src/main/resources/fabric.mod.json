@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "id": "manascore",
+  "id": "${mod_id}",
   "version": "${version}",
   "name": "ManasCore",
   "description": "Utility and Core Library for Manas Mods",
@@ -10,19 +10,19 @@
   "contact": {
     "homepage": ""
   },
-  "license": "All-Rights-Reserved",
-  "icon": "assets/manascore/icon.png",
+  "license": "GPLv3",
+  "icon": "assets/manascore/icon.jpg",
   "environment": "*",
   "entrypoints": {
     "main": [
-      "com.github.manasmods.manascore.storage.fabric.ManascoreFabric"
+      "com.github.manasmods.manascore.storage.fabric.ManasCoreStorageFabric"
     ],
     "client": [
-      "com.github.manasmods.manascore.fabric.client.ManascoreFabricClient"
+      "com.github.manasmods.manascore.storage.fabric.client.ManasCoreStorageFabricClient"
     ]
   },
   "mixins": [
-    "manascore.mixins.json"
+    "${mod_id}.mixins.json"
   ],
   "depends": {
     "fabricloader": ">=0.16.3",
@@ -32,6 +32,5 @@
     "fabric-api": "*"
   },
   "suggests": {
-    "another-mod": "*"
   }
 }
