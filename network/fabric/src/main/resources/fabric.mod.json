@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "id": "${mod_id}",
+  "version": "${version}",
+  "name": "ManasCore",
+  "description": "Utility and Core Library for Manas Mods",
+  "authors": [
+    "ManasMods"
+  ],
+  "contact": {
+    "homepage": ""
+  },
+  "license": "GPLv3",
+  "icon": "assets/manascore/icon.jpg",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "com.github.manasmods.manascore.network.fabric.ManasCoreNetworkFabric"
+    ],
+    "client": [
+      "com.github.manasmods.manascore.network.fabric.client.ManasCoreNetworkFabricClient"
+    ]
+  },
+  "mixins": [
+    "${mod_id}.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.16.3",
+    "minecraft": "~1.21.1",
+    "java": ">=21",
+    "architectury": ">=13.0.6",
+    "fabric-api": "*"
+  },
+  "suggests": {
+  }
+}
