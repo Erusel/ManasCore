@@ -17,9 +17,7 @@
     "main": [
       "com.github.manasmods.manascore.network.fabric.ManasCoreNetworkFabric"
     ],
-    "client": [
-      "com.github.manasmods.manascore.network.fabric.client.ManasCoreNetworkFabricClient"
-    ]
+    "client": []
   },
   "mixins": [
     "${mod_id}.mixins.json"
