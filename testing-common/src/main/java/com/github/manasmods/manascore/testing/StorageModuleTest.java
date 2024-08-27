@@ -26,15 +26,15 @@ public class StorageModuleTest {
         // Register storage
         StorageEvents.REGISTER_ENTITY_STORAGE.register(registry -> {
             ENTITY_KEY = registry.register(ResourceLocation.fromNamespaceAndPath(ModuleConstants.MOD_ID, "test_storage"), TestStorage.class, entity -> entity instanceof Player, TestStorage::new);
-            LOG.info("Registered entity storage key: %s", ENTITY_KEY.id());
+            LOG.info("Registered entity storage key: {}", ENTITY_KEY.id());
         });
         StorageEvents.REGISTER_CHUNK_STORAGE.register(registry -> {
             CHUNK_KEY = registry.register(ResourceLocation.fromNamespaceAndPath(ModuleConstants.MOD_ID, "test_storage"), TestStorage.class, chunk -> true, TestStorage::new);
-            LOG.info("Registered chunk storage key: %s", CHUNK_KEY.id());
+            LOG.info("Registered chunk storage key: {}", CHUNK_KEY.id());
         });
         StorageEvents.REGISTER_WORLD_STORAGE.register(registry -> {
             WORLD_KEY = registry.register(ResourceLocation.fromNamespaceAndPath(ModuleConstants.MOD_ID, "test_storage"), TestStorage.class, level -> true, TestStorage::new);
-            LOG.info("Registered world storage key: %s", WORLD_KEY.id());
+            LOG.info("Registered world storage key: {}", WORLD_KEY.id());
         });
         // Register event listeners that change the storage
         PlayerEvent.DROP_ITEM.register((player, entity) -> {
@@ -68,9 +68,9 @@ public class StorageModuleTest {
         LevelChunk chunk = level.getChunkAt(player.blockPosition());
         boolean isClientSide = level.isClientSide();
 
-        LOG.info("Storage of entity %s on %s:\n%s", player.getId(), isClientSide ? "client" : "server", player.manasCore$getStorage(ENTITY_KEY));
-        LOG.info("Storage at chunk %s on %s:\n%s", chunk.getPos(), isClientSide ? "client" : "server", chunk.manasCore$getStorage(CHUNK_KEY));
-        LOG.info("Storage of world %s on %s:\n%s", level.dimension().location(), isClientSide ? "client" : "server", level.manasCore$getStorage(WORLD_KEY));
+        LOG.info("Storage of entity {} on {}:\n{}", player.getId(), isClientSide ? "client" : "server", player.manasCore$getStorage(ENTITY_KEY));
+        LOG.info("Storage at chunk {} on {}:\n{}", chunk.getPos(), isClientSide ? "client" : "server", chunk.manasCore$getStorage(CHUNK_KEY));
+        LOG.info("Storage of world {} on {}:\n{}", level.dimension().location(), isClientSide ? "client" : "server", level.manasCore$getStorage(WORLD_KEY));
     }
 
     // Storage implementation
