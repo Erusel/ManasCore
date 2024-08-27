@@ -3,6 +3,7 @@ plugins {
     id 'architectury-plugin' version '3.4-SNAPSHOT'
     id 'com.github.johnrengelman.shadow' version '8.1.1' apply false
     id "io.freefair.lombok" version "8.10" apply false
+    id "com.github.gmazzo.buildconfig" version "5.4.0" apply false
 }
 
 architectury {
@@ -18,9 +19,21 @@ subprojects {
     apply plugin: 'dev.architectury.loom'
     apply plugin: 'architectury-plugin'
     apply plugin: 'maven-publish'
+    apply plugin: 'io.freefair.lombok'
 
     if (!project.name.endsWith("common")) {
         apply plugin: 'com.github.johnrengelman.shadow'
+    } else {
+        apply plugin: 'com.github.gmazzo.buildconfig'
+    }
+
+    ext {
+        var nameSeparatorIndex = project.path.lastIndexOf(':');
+        var nameOffset = project.path.startsWith(':') && nameSeparatorIndex > 0 ? 1 : 0
+
+        module_name = project.path.substring(nameOffset, nameSeparatorIndex == -1 ? project.path.length() : nameSeparatorIndex)
+
+        mod_id = "${rootProject.archives_name}_$module_name"
     }
 
     architectury {
@@ -78,24 +91,24 @@ subprojects {
         minecraft "net.minecraft:minecraft:$rootProject.minecraft_version"
         mappings loom.officialMojangMappings()
 
-        var nameSeparatorIndex = project.path.lastIndexOf(':');
-        var moduleName = project.path.substring(0, nameSeparatorIndex == -1 ? project.path.length() : nameSeparatorIndex)
-
         if (project.name.endsWith("common")) {
             modImplementation "net.fabricmc:fabric-loader:$rootProject.fabric_loader_version"
             modImplementation "dev.architectury:architectury:$rootProject.architectury_api_version"
-        } else if (project.name.endsWith("fabric")) {
+        }
+
+        if (project.name.endsWith("fabric")) {
             modImplementation "net.fabricmc:fabric-loader:$rootProject.fabric_loader_version"
             modImplementation "net.fabricmc.fabric-api:fabric-api:$rootProject.fabric_api_version"
             modImplementation "dev.architectury:architectury-fabric:$rootProject.architectury_api_version"
-            println("Adding fabric dependencies for $moduleName")
-            common(project(path: "$moduleName:common", configuration: 'namedElements')) { transitive false }
-            shadowBundle project(path: "$moduleName:common", configuration: 'transformProductionFabric')
-        } else if (project.name.endsWith("neoforge")) {
+            common(project(path: ":$project.module_name:common", configuration: 'namedElements')) { transitive false }
+            shadowBundle project(path: ":$project.module_name:common", configuration: 'transformProductionFabric')
+        }
+
+        if (project.name.endsWith("neoforge")) {
             neoForge "net.neoforged:neoforge:$rootProject.neoforge_version"
             modImplementation "dev.architectury:architectury-neoforge:$rootProject.architectury_api_version"
-            common(project(path: "$moduleName:common", configuration: 'namedElements')) { transitive false }
-            shadowBundle project(path: "$moduleName:common", configuration: 'transformProductionNeoForge')
+            common(project(path: ":$project.module_name:common", configuration: 'namedElements')) { transitive false }
+            shadowBundle project(path: ":$project.module_name:common", configuration: 'transformProductionNeoForge')
         }
     }
 
@@ -134,7 +147,8 @@ subprojects {
     if (!project.name.endsWith("common")) {
         processResources {
             def placeholders = [
-                    version: project.version
+                    version: project.version,
+                    mod_id : project.mod_id
             ]
 
             placeholders.forEach { key, value ->
@@ -159,6 +173,15 @@ subprojects {
 
         remapJar {
             input.set shadowJar.archiveFile
+        }
+    }
+
+    if (project.name.endsWith("common")) {
+        buildConfig {
+            className("ModuleConstants")
+            packageName(project.group + ".${rootProject.name}.$project.module_name")
+            useJavaOutput()
+            buildConfigField(String, "MOD_ID", "$project.mod_id")
         }
     }
 }
