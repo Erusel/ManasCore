@@ -17,9 +17,7 @@
     "main": [
       "com.github.manasmods.manascore.storage.fabric.ManasCoreStorageFabric"
     ],
-    "client": [
-      "com.github.manasmods.manascore.storage.fabric.client.ManasCoreStorageFabricClient"
-    ]
+    "client": []
   },
   "mixins": [
     "${mod_id}.mixins.json"
@@ -29,7 +27,8 @@
     "minecraft": "~1.21.1",
     "java": ">=21",
     "architectury": ">=13.0.6",
-    "fabric-api": "*"
+    "fabric-api": "*",
+    "manascore_network": ">=${version}"
   },
   "suggests": {
   }
