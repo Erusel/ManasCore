@@ -157,8 +157,12 @@ subprojects {
     if (!project.name.endsWith("common")) {
         processResources {
             def placeholders = [
-                    version: project.version,
-                    mod_id : project.mod_id
+                    version : project.version,
+                    mod_id  : project.mod_id,
+                    mod_name: "$mod_display_name - ${project.module_name.capitalize()}",
+                    architectury_version: architectury_api_version,
+                    minecraft_version: minecraft_version,
+                    fabric_loader_version: fabric_loader_version
             ]
 
             placeholders.forEach { key, value ->

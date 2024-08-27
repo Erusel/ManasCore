@@ -15,11 +15,9 @@
   "environment": "*",
   "entrypoints": {
     "main": [
-      "com.github.manasmods.manascore.network.fabric.ManasCoreNetworkFabric"
+      "com.github.manasmods.manascore.storage.fabric.ManasCoreStorageFabric"
     ],
-    "client": [
-      "com.github.manasmods.manascore.network.fabric.client.ManasCoreNetworkFabricClient"
-    ]
+    "client": []
   },
   "mixins": [
     "${mod_id}.mixins.json"
