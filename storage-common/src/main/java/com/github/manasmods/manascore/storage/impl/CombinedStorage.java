@@ -49,7 +49,7 @@ public class CombinedStorage {
             // Construct storage
             Storage storage = StorageManager.constructStorageFor(this.holder.manasCore$getStorageType(), id, holder);
             if (storage == null) {
-                LOG.warn("Failed to construct storage for id %s. All information about this storage will be dropped!", id);
+                LOG.warn("Failed to construct storage for id {}. All information about this storage will be dropped!", id);
                 return;
             }
             // Load storage data
@@ -67,7 +67,7 @@ public class CombinedStorage {
             ResourceLocation id = ResourceLocation.tryParse(entryTag.getString(STORAGE_ID_KEY));
             Storage storage = this.storages.get(id);
             if (storage == null) {
-                LOG.warn("Failed to find storage for id %s. All information about this storage will be dropped!", id);
+                LOG.warn("Failed to find storage for id {}. All information about this storage will be dropped!", id);
                 continue;
             }
 
