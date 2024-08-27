@@ -45,8 +45,16 @@ subprojects {
 
         if (project.name.endsWith("fabric")) {
             fabric()
-        } else if (project.name.endsWith("neoforge")) {
+        }
+
+        if (project.name.endsWith("neoforge")) {
             neoForge()
+        }
+    }
+
+    loom {
+        if (!project.name.startsWith("testing")) {
+            runConfigs.each { it.setIdeConfigGenerated(false) }
         }
     }
 
@@ -67,7 +75,9 @@ subprojects {
 
             if (project.name.endsWith("fabric")) {
                 developmentFabric.extendsFrom common
-            } else if (project.name.endsWith("neoforge")) {
+            }
+
+            if (project.name.endsWith("neoforge")) {
                 developmentNeoForge.extendsFrom common
             }
 

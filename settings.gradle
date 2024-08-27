@@ -9,7 +9,7 @@ pluginManagement {
 
 rootProject.name = 'manascore'
 
-["network", "storage"].forEach { module ->
+["network", "storage", "testing"].forEach { module ->
     include ":$module-common"
     include ":$module-fabric"
     include ":$module-neoforge"
