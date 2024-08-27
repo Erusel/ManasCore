@@ -60,8 +60,12 @@ subprojects {
     }
 
     loom {
-        if (!project.name.startsWith("testing")) {
-            runConfigs.each { it.setIdeConfigGenerated(false) }
+        runConfigs.each {
+            if (!project.name.startsWith("testing")) {
+                it.setIdeConfigGenerated(false)
+            } else {
+                it.runDir = "../run/$it.environment"
+            }
         }
     }
 
@@ -164,11 +168,11 @@ subprojects {
     if (!project.name.endsWith("common")) {
         processResources {
             def placeholders = [
-                    version : project.version,
-                    mod_id  : project.mod_id,
-                    mod_name: "$mod_display_name - ${project.module_name.capitalize()}",
-                    architectury_version: architectury_api_version,
-                    minecraft_version: minecraft_version,
+                    version              : project.version,
+                    mod_id               : project.mod_id,
+                    mod_name             : "$mod_display_name - ${project.module_name.capitalize()}",
+                    architectury_version : architectury_api_version,
+                    minecraft_version    : minecraft_version,
                     fabric_loader_version: fabric_loader_version
             ]
 
