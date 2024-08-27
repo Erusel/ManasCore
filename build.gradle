@@ -20,6 +20,13 @@ subprojects {
     apply plugin: 'architectury-plugin'
     apply plugin: 'maven-publish'
     apply plugin: 'io.freefair.lombok'
+    apply plugin: 'idea'
+
+    idea {
+        module {
+            downloadJavadoc = true
+        }
+    }
 
     if (!project.name.endsWith("common")) {
         apply plugin: 'com.github.johnrengelman.shadow'
