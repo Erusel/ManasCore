@@ -7,5 +7,6 @@ public final class ManasCoreTesting {
     public static final Logger LOG = LogManager.getFormatterLogger("ManasCore - Testing");
 
     public static void init() {
+        StorageModuleTest.init();
     }
 }

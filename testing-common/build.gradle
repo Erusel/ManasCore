@@ -1,0 +1,12 @@
+ext {
+    includedProjects = [
+        ":network",
+        ":storage"
+    ]
+}
+
+dependencies {
+    includedProjects.forEach {
+        implementation(project(path: ":$it-common", configuration: 'namedElements')) { transitive false }
+    }
+}

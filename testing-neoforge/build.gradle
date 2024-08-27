@@ -1,10 +1,5 @@
-var includedProjects = [
-        ":network",
-        ":storage"
-]
-
 dependencies {
-    includedProjects.forEach {
+    project(":testing-common").includedProjects.forEach {
         common(project(path: ":$it-common", configuration: 'namedElements')) { transitive false }
         implementation(project(path: ":$it-neoforge", configuration: 'namedElements')) { transitive false }
     }
