@@ -1,0 +1,19 @@
+repositories {
+    maven {
+        name = "Terraformers"
+        url = "https://maven.terraformersmc.com/"
+    }
+}
+
+var includedProjects = [
+        ":network",
+        ":storage"
+]
+
+dependencies {
+    includedProjects.forEach {
+        common(project(path: ":$it-common", configuration: 'namedElements')) { transitive false }
+        implementation(project(path: ":$it-fabric", configuration: 'namedElements')) { transitive false }
+    }
+    modImplementation("com.terraformersmc:modmenu:11.0.2")
+}

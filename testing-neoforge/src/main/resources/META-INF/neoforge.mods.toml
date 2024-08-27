@@ -34,12 +34,5 @@ logoFile = "icon.jpg"
     ordering = "AFTER"
     side = "BOTH"
 
-[[dependencies.${mod_id}]]
-    modId = "manascore_network"
-    type = "required"
-    versionRange = "[${version},)"
-    ordering = "AFTER"
-    side = "BOTH"
-
 [[mixins]]
 config = "${mod_id}.mixins.json"
