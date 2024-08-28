@@ -6,12 +6,8 @@ const config: Config = {
     title: 'ManasCore',
     tagline: 'Simple and modular library for Minecraft mods',
     favicon: 'img/favicon.ico',
-
-    // Set the production url of your site here
-    url: 'https://your-docusaurus-site.example.com',
-    // Set the /<baseUrl>/ pathname under which your site is served
-    // For GitHub pages deployment, it is often '/<projectName>/'
-    baseUrl: '/',
+    url: 'https://manasmods.github.io',
+    baseUrl: '/ManasCore/',
     organizationName: 'ManasMods',
     projectName: 'ManasCore',
 
