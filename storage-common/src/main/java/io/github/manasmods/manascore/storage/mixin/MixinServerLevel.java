@@ -1,5 +1,8 @@
+/*
+ * Copyright (c) 2024. ManasMods
+ * GNU General Public License 3
+ */
 package io.github.manasmods.manascore.storage.mixin;
-
 
 import io.github.manasmods.manascore.storage.impl.StorageManager;
 import io.github.manasmods.manascore.storage.impl.StoragePersistentState;

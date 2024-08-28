@@ -1,13 +1,13 @@
 {
   "injected_interfaces": {
     "net/minecraft/class_1297": [
-      "com/github/manasmods/manascore/storage/api/StorageHolder"
+      "io/github/manasmods/manascore/storage/api/StorageHolder"
     ],
     "net/minecraft/class_2818": [
-      "com/github/manasmods/manascore/storage/api/StorageHolder"
+      "io/github/manasmods/manascore/storage/api/StorageHolder"
     ],
     "net/minecraft/class_1937": [
-      "com/github/manasmods/manascore/storage/api/StorageHolder"
+      "io/github/manasmods/manascore/storage/api/StorageHolder"
     ]
   },
   "accessWidener": "manascore_storage.accesswidener"
