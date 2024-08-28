@@ -10,6 +10,7 @@ plugins {
     id "io.freefair.lombok" version "8.10" apply false
     id "com.github.gmazzo.buildconfig" version "5.4.0" apply false
     id "idea"
+    id 'org.jreleaser' version '1.13.1' apply false
 }
 
 architectury {
@@ -24,9 +25,13 @@ allprojects {
 subprojects {
     apply plugin: 'dev.architectury.loom'
     apply plugin: 'architectury-plugin'
-    apply plugin: 'maven-publish'
     apply plugin: 'io.freefair.lombok'
-    apply plugin: 'signing'
+
+    if (!project.name.startsWith("testing")) {
+        apply plugin: 'org.jreleaser'
+        apply plugin: 'maven-publish'
+        //apply plugin: 'signing'
+    }
 
     idea {
         module {
@@ -156,28 +161,69 @@ subprojects {
     }
 
     if (!project.name.startsWith("testing")) {
+        jreleaser {
+            gitRootSearch = true
+
+            signing {
+                active = 'ALWAYS'
+                armored = true
+            }
+            deploy {
+                maven {
+                    mavenCentral {
+                        sonatype {
+                            active = 'ALWAYS'
+                            url = 'https://central.sonatype.com/api/v1/publisher'
+                            stagingRepository('build/staging-deploy')
+                        }
+                    }
+                }
+            }
+        }
         publishing {
             publications {
                 mavenJava(MavenPublication) {
                     artifactId = base.archivesName.get()
                     from components.java
+
+                    pom {
+                        name = "$mod_display_name - ${project.module_name.capitalize()}"
+                        description = "An Open Source Minecraft Modding Library"
+                        url = "https://github.com/ManasMods/ManasCore"
+
+                        licenses {
+                            license {
+                                name = "GNU General Public License 3"
+                                url = "https://www.gnu.org/licenses/gpl-3.0.html"
+                            }
+                        }
+
+                        developers {
+                            developer {
+                                id = 'Charismara'
+                                name = 'Christian Raoulis'
+                            }
+                        }
+
+                        scm {
+                            connection = 'scm:git:git://github.com/ManasMods/ManasCore.git'
+                            developerConnection = 'scm:git:git@github.com:ManasMods/ManasCore.git'
+                            url = 'https://github.com/ManasMods/ManasCore'
+                        }
+                    }
                 }
             }
 
             repositories {
                 maven {
-                    url "file://${rootProject.projectDir}/mcmodsrepo"
+                    url layout.buildDirectory.dir('staging-deploy')
                 }
             }
         }
 
-        signing {
-            def signingKeyId = findProperty("signingKeyId")
-            def signingKey = findProperty("signingKey")
-            def signingPassword = findProperty("signingPassword")
-            useInMemoryPgpKeys(signingKeyId, signingKey, signingPassword)
-
-            sign publishing.publications.mavenJava
+        tasks.publish.doFirst {
+            def dir = file(layout.buildDirectory.dir("jreleaser"))
+            dir.mkdirs()
         }
     }
 
