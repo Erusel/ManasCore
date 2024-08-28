@@ -21,6 +21,7 @@ subprojects {
     apply plugin: 'architectury-plugin'
     apply plugin: 'maven-publish'
     apply plugin: 'io.freefair.lombok'
+    apply plugin: 'signing'
 
     idea {
         module {
@@ -138,6 +139,7 @@ subprojects {
 
     java {
         withSourcesJar()
+        withJavadocJar()
 
         sourceCompatibility = JavaVersion.VERSION_21
         targetCompatibility = JavaVersion.VERSION_21
@@ -147,7 +149,6 @@ subprojects {
         it.options.release = 21
     }
 
-    // Configure Maven publishing.
     publishing {
         publications {
             mavenJava(MavenPublication) {
@@ -156,13 +157,21 @@ subprojects {
             }
         }
 
-        // See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
         repositories {
             // Add repositories to publish to here.
             // Notice: This block does NOT have the same function as the block in the top level.
             // The repositories here will be used for publishing your artifact, not for
             // retrieving dependencies.
         }
+    }
+
+    signing {
+        def signingKeyId = findProperty("signingKeyId")
+        def signingKey = findProperty("signingKey")
+        def signingPassword = findProperty("signingPassword")
+        useInMemoryPgpKeys(signingKeyId, signingKey, signingPassword)
+
+        sign publishing.publications.mavenJava
     }
 
     if (!project.name.endsWith("common")) {
