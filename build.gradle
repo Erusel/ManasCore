@@ -149,29 +149,31 @@ subprojects {
         it.options.release = 21
     }
 
-    publishing {
-        publications {
-            mavenJava(MavenPublication) {
-                artifactId = base.archivesName.get()
-                from components.java
+    if (!project.name.startsWith("testing")) {
+        publishing {
+            publications {
+                mavenJava(MavenPublication) {
+                    artifactId = base.archivesName.get()
+                    from components.java
+                }
+            }
+
+            repositories {
+                // Add repositories to publish to here.
+                // Notice: This block does NOT have the same function as the block in the top level.
+                // The repositories here will be used for publishing your artifact, not for
+                // retrieving dependencies.
             }
         }
 
-        repositories {
-            // Add repositories to publish to here.
-            // Notice: This block does NOT have the same function as the block in the top level.
-            // The repositories here will be used for publishing your artifact, not for
-            // retrieving dependencies.
+        signing {
+            def signingKeyId = findProperty("signingKeyId")
+            def signingKey = findProperty("signingKey")
+            def signingPassword = findProperty("signingPassword")
+            useInMemoryPgpKeys(signingKeyId, signingKey, signingPassword)
+
+            sign publishing.publications.mavenJava
         }
-    }
-
-    signing {
-        def signingKeyId = findProperty("signingKeyId")
-        def signingKey = findProperty("signingKey")
-        def signingPassword = findProperty("signingPassword")
-        useInMemoryPgpKeys(signingKeyId, signingKey, signingPassword)
-
-        sign publishing.publications.mavenJava
     }
 
     if (!project.name.endsWith("common")) {
