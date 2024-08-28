@@ -7,8 +7,8 @@ repositories {
 
 dependencies {
     project(":testing-common").includedProjects.forEach {
-        common(project(path: ":$it-common", configuration: 'namedElements')) { transitive false }
-        implementation(project(path: ":$it-fabric", configuration: 'namedElements')) { transitive false }
+        common(project(path: ":$it-common", configuration: 'namedElements'))
+        implementation(project(path: ":$it-fabric", configuration: 'namedElements'))
     }
     modImplementation("com.terraformersmc:modmenu:11.0.2")
 }
