@@ -10,7 +10,7 @@
   "contact": {
     "homepage": ""
   },
-  "license": "GPLv3",
+  "license": "${license}",
   "icon": "assets/manascore/icon.jpg",
   "environment": "*",
   "entrypoints": {

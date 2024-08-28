@@ -60,6 +60,8 @@ subprojects {
     }
 
     loom {
+        enableTransitiveAccessWideners = true
+
         runConfigs.each {
             if (!project.name.startsWith("testing")) {
                 it.setIdeConfigGenerated(false)
@@ -173,7 +175,8 @@ subprojects {
                     mod_name             : "$mod_display_name - ${project.module_name.capitalize()}",
                     architectury_version : architectury_api_version,
                     minecraft_version    : minecraft_version,
-                    fabric_loader_version: fabric_loader_version
+                    fabric_loader_version: fabric_loader_version,
+                    license              : "GPLv3"
             ]
 
             placeholders.forEach { key, value ->
