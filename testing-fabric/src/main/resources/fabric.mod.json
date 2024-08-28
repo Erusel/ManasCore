@@ -15,7 +15,7 @@
   "environment": "*",
   "entrypoints": {
     "main": [
-      "com.github.manasmods.manascore.testing.fabric.ManasCoreTestingFabric"
+      "io.github.manasmods.manascore.testing.fabric.ManasCoreTestingFabric"
     ],
     "client": []
   },

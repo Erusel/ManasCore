@@ -1,4 +1,4 @@
-package com.github.manasmods.manascore.storage.mixin;
+package io.github.manasmods.manascore.storage.mixin;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;

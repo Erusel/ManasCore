@@ -1,7 +1,7 @@
-package com.github.manasmods.manascore.storage.impl;
+package io.github.manasmods.manascore.storage.impl;
 
-import com.github.manasmods.manascore.storage.api.Storage;
-import com.github.manasmods.manascore.storage.api.StorageHolder;
+import io.github.manasmods.manascore.storage.api.Storage;
+import io.github.manasmods.manascore.storage.api.StorageHolder;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
@@ -11,7 +11,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.github.manasmods.manascore.storage.ManasCoreStorage.LOG;
+import static io.github.manasmods.manascore.storage.ManasCoreStorage.LOG;
 
 public class CombinedStorage {
     private static final String STORAGE_LIST_KEY = "manascore_registry_storage";

@@ -1,8 +1,8 @@
-package com.github.manasmods.manascore.storage.mixin;
+package io.github.manasmods.manascore.storage.mixin;
 
 
-import com.github.manasmods.manascore.storage.impl.StorageManager;
-import com.github.manasmods.manascore.storage.impl.StoragePersistentState;
+import io.github.manasmods.manascore.storage.impl.StorageManager;
+import io.github.manasmods.manascore.storage.impl.StoragePersistentState;
 import net.minecraft.core.Holder;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceKey;

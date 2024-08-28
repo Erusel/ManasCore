@@ -1,6 +1,6 @@
-package com.github.manasmods.manascore.storage.mixin;
+package io.github.manasmods.manascore.storage.mixin;
 
-import com.github.manasmods.manascore.storage.impl.StoragePersistentState;
+import io.github.manasmods.manascore.storage.impl.StoragePersistentState;
 import com.mojang.datafixers.DataFixer;
 import com.mojang.serialization.Dynamic;
 import net.minecraft.util.datafix.DataFixTypes;

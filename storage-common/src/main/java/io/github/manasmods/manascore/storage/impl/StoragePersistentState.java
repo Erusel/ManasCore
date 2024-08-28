@@ -1,4 +1,4 @@
-package com.github.manasmods.manascore.storage.impl;
+package io.github.manasmods.manascore.storage.impl;
 
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;

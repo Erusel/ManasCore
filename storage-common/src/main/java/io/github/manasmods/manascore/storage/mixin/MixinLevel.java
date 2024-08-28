@@ -1,12 +1,12 @@
-package com.github.manasmods.manascore.storage.mixin;
+package io.github.manasmods.manascore.storage.mixin;
 
 
-import com.github.manasmods.manascore.storage.api.Storage;
-import com.github.manasmods.manascore.storage.api.StorageHolder;
-import com.github.manasmods.manascore.storage.api.StorageKey;
-import com.github.manasmods.manascore.storage.api.StorageType;
-import com.github.manasmods.manascore.storage.impl.CombinedStorage;
-import com.github.manasmods.manascore.storage.impl.StorageManager;
+import io.github.manasmods.manascore.storage.api.Storage;
+import io.github.manasmods.manascore.storage.api.StorageHolder;
+import io.github.manasmods.manascore.storage.api.StorageKey;
+import io.github.manasmods.manascore.storage.api.StorageType;
+import io.github.manasmods.manascore.storage.impl.CombinedStorage;
+import io.github.manasmods.manascore.storage.impl.StorageManager;
 import net.minecraft.core.Holder;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.nbt.CompoundTag;

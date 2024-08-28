@@ -1,4 +1,4 @@
-package com.github.manasmods.manascore.storage.api;
+package io.github.manasmods.manascore.storage.api;
 
 import dev.architectury.event.Event;
 import dev.architectury.event.EventFactory;

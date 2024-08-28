@@ -1,8 +1,8 @@
-package com.github.manasmods.manascore.storage.impl.network.s2c;
+package io.github.manasmods.manascore.storage.impl.network.s2c;
 
 
-import com.github.manasmods.manascore.storage.api.StorageHolder;
-import com.github.manasmods.manascore.storage.impl.CombinedStorage;
+import io.github.manasmods.manascore.storage.api.StorageHolder;
+import io.github.manasmods.manascore.storage.impl.CombinedStorage;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;

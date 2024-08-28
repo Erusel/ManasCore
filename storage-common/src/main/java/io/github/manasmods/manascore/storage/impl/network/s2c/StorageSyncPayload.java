@@ -1,4 +1,4 @@
-package com.github.manasmods.manascore.storage.impl.network.s2c;
+package io.github.manasmods.manascore.storage.impl.network.s2c;
 
 
 import net.minecraft.nbt.CompoundTag;

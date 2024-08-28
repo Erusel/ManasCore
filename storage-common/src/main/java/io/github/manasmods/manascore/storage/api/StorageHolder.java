@@ -1,7 +1,7 @@
-package com.github.manasmods.manascore.storage.api;
+package io.github.manasmods.manascore.storage.api;
 
-import com.github.manasmods.manascore.storage.impl.CombinedStorage;
-import com.github.manasmods.manascore.storage.impl.StorageManager;
+import io.github.manasmods.manascore.storage.impl.CombinedStorage;
+import io.github.manasmods.manascore.storage.impl.StorageManager;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;

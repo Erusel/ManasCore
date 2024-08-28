@@ -1,6 +1,6 @@
-package com.github.manasmods.manascore.network.fabric;
+package io.github.manasmods.manascore.network.fabric;
 
-import com.github.manasmods.manascore.network.ManasCoreNetwork;
+import io.github.manasmods.manascore.network.ManasCoreNetwork;
 import net.fabricmc.api.ModInitializer;
 
 public class ManasCoreNetworkFabric implements ModInitializer {

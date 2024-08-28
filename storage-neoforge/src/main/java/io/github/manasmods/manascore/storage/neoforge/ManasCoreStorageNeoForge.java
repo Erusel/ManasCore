@@ -1,7 +1,7 @@
-package com.github.manasmods.manascore.storage.neoforge;
+package io.github.manasmods.manascore.storage.neoforge;
 
-import com.github.manasmods.manascore.storage.ManasCoreStorage;
-import com.github.manasmods.manascore.storage.ModuleConstants;
+import io.github.manasmods.manascore.storage.ManasCoreStorage;
+import io.github.manasmods.manascore.storage.ModuleConstants;
 import net.neoforged.fml.common.Mod;
 
 @Mod(ModuleConstants.MOD_ID)

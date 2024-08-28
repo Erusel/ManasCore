@@ -1,4 +1,4 @@
-package com.github.manasmods.manascore.network.api.util;
+package io.github.manasmods.manascore.network.api.util;
 
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;

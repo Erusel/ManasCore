@@ -1,9 +1,9 @@
-package com.github.manasmods.manascore.storage.impl.network;
+package io.github.manasmods.manascore.storage.impl.network;
 
-import com.github.manasmods.manascore.network.api.util.NetworkUtils;
-import com.github.manasmods.manascore.storage.impl.network.s2c.SyncChunkStoragePayload;
-import com.github.manasmods.manascore.storage.impl.network.s2c.SyncEntityStoragePayload;
-import com.github.manasmods.manascore.storage.impl.network.s2c.SyncWorldStoragePayload;
+import io.github.manasmods.manascore.network.api.util.NetworkUtils;
+import io.github.manasmods.manascore.storage.impl.network.s2c.SyncChunkStoragePayload;
+import io.github.manasmods.manascore.storage.impl.network.s2c.SyncEntityStoragePayload;
+import io.github.manasmods.manascore.storage.impl.network.s2c.SyncWorldStoragePayload;
 
 public class ManasStorageNetwork {
     public static void init() {

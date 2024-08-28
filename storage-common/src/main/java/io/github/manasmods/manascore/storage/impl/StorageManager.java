@@ -1,10 +1,10 @@
-package com.github.manasmods.manascore.storage.impl;
+package io.github.manasmods.manascore.storage.impl;
 
-import com.github.manasmods.manascore.storage.api.*;
-import com.github.manasmods.manascore.storage.impl.network.s2c.StorageSyncPayload;
-import com.github.manasmods.manascore.storage.impl.network.s2c.SyncChunkStoragePayload;
-import com.github.manasmods.manascore.storage.impl.network.s2c.SyncEntityStoragePayload;
-import com.github.manasmods.manascore.storage.impl.network.s2c.SyncWorldStoragePayload;
+import io.github.manasmods.manascore.storage.api.*;
+import io.github.manasmods.manascore.storage.impl.network.s2c.StorageSyncPayload;
+import io.github.manasmods.manascore.storage.impl.network.s2c.SyncChunkStoragePayload;
+import io.github.manasmods.manascore.storage.impl.network.s2c.SyncEntityStoragePayload;
+import io.github.manasmods.manascore.storage.impl.network.s2c.SyncWorldStoragePayload;
 import com.mojang.datafixers.util.Pair;
 import dev.architectury.event.events.common.PlayerEvent;
 import dev.architectury.networking.NetworkManager;
