@@ -23,5 +23,10 @@ public static class ExampleStorage extends Storage {
     public int getExampleInt() {
         return exampleInt;
     }
+    
+    public void setExampleInt(int exampleInt) {
+        this.exampleInt = exampleInt;
+        markDirty(); // Tells the system that the storage has been modified
+    }
 }
 ```
