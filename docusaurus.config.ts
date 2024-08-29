@@ -10,6 +10,7 @@ const config: Config = {
     baseUrl: '/ManasCore/',
     organizationName: 'ManasMods',
     projectName: 'ManasCore',
+    deploymentBranch: 'gh-pages',
 
     onBrokenLinks: 'throw',
     onBrokenMarkdownLinks: 'warn',
