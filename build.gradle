@@ -30,7 +30,6 @@ subprojects {
     if (!project.name.startsWith("testing")) {
         apply plugin: 'org.jreleaser'
         apply plugin: 'maven-publish'
-        //apply plugin: 'signing'
     }
 
     idea {
