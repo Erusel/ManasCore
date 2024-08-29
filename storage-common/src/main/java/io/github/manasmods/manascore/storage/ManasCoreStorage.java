@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2024. ManasMods
+ * GNU General Public License 3
+ */
+
 package io.github.manasmods.manascore.storage;
 
 import io.github.manasmods.manascore.storage.impl.StorageManager;
@@ -12,5 +17,7 @@ public final class ManasCoreStorage {
     public static void init() {
         ManasStorageNetwork.init();
         LifecycleEvent.SETUP.register(StorageManager::init);
+        // FIXME - Client chunk data is desynced when reconnecting to a server
+        // FIXME - Client world data is desynced when changing dimensions
     }
 }

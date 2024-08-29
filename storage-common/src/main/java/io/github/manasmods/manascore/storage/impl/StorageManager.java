@@ -34,13 +34,17 @@ public final class StorageManager {
         StorageEvents.REGISTER_WORLD_STORAGE.invoker().register(LEVEL_STORAGE_REGISTRY);
         StorageEvents.REGISTER_CHUNK_STORAGE.invoker().register(CHUNK_STORAGE_REGISTRY);
         StorageEvents.REGISTER_ENTITY_STORAGE.invoker().register(ENTITY_STORAGE_REGISTRY);
-        // Initial client syncronization
+        // Initial client synchronization
         PlayerEvent.PLAYER_JOIN.register(player -> {
             player.manasCore$sync(player);
             ServerLevel level = player.serverLevel();
             level.getChunkAt(player.blockPosition()).manasCore$sync(player);
             level.manasCore$sync(player);
         });
+        // Synchronization on respawn and dimension change
+        PlayerEvent.PLAYER_RESPAWN.register((player, b, removalReason) -> syncTracking(player));
+        PlayerEvent.CHANGE_DIMENSION.register((serverPlayer, resourceKey, resourceKey1) -> syncTracking(serverPlayer));
+
         // Copy storage from old player to new player
         PlayerEvent.PLAYER_CLONE.register((oldPlayer, newPlayer, wonGame) -> newPlayer.manasCore$setCombinedStorage(oldPlayer.manasCore$getCombinedStorage()));
     }
@@ -58,7 +62,7 @@ public final class StorageManager {
     }
 
     public static void syncTracking(StorageHolder source, boolean update) {
-        NetworkManager.sendToPlayers(source.manasCore$getTrackingPlayers(), createSyncPacket(source,update));
+        NetworkManager.sendToPlayers(source.manasCore$getTrackingPlayers(), createSyncPacket(source, update));
     }
 
     public static void syncTarget(StorageHolder source, ServerPlayer target) {
