@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2024. ManasMods
+ * GNU General Public License 3
+ */
+
 ext {
     includedProjects = [
         ":network",
@@ -7,6 +12,6 @@ ext {
 
 dependencies {
     includedProjects.forEach {
-        implementation(project(path: ":$it-common", configuration: 'namedElements')) { transitive false }
+        implementation(project(path: "$it-common", configuration: 'namedElements')) { transitive false }
     }
 }

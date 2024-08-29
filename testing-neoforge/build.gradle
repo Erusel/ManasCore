@@ -1,6 +1,22 @@
+/*
+ * Copyright (c) 2024. ManasMods
+ * GNU General Public License 3
+ */
+
+loom {
+    mods {
+        project(":testing-common").includedProjects.forEach {
+            def moduleProject = project("$it-fabric")
+            register(moduleProject.name) {
+                sourceSet("main", moduleProject)
+            }
+        }
+    }
+}
+
 dependencies {
     project(":testing-common").includedProjects.forEach {
-        common(project(path: ":$it-common", configuration: 'namedElements')) { transitive false }
-        implementation(project(path: ":$it-neoforge", configuration: 'namedElements')) { transitive false }
+        common(project(path: "$it-common", configuration: 'namedElements')) { transitive false }
+        implementation(project(path: "$it-neoforge", configuration: 'namedElements')) { transitive false }
     }
 }
