@@ -11,6 +11,7 @@ const config: Config = {
     organizationName: 'ManasMods',
     projectName: 'ManasCore',
     deploymentBranch: 'gh-pages',
+    trailingSlash: true,
 
     onBrokenLinks: 'throw',
     onBrokenMarkdownLinks: 'warn',
