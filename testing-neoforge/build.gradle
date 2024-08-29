@@ -6,7 +6,7 @@
 loom {
     mods {
         project(":testing-common").includedProjects.forEach {
-            def moduleProject = project("$it-fabric")
+            def moduleProject = project("$it-neoforge")
             register(moduleProject.name) {
                 sourceSet("main", moduleProject)
             }
