@@ -12,17 +12,24 @@ import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
+import net.neoforged.neoforge.event.level.ChunkWatchEvent;
 
 @Mod(ModuleConstants.MOD_ID)
 public final class ManasCoreStorageNeoForge {
     public ManasCoreStorageNeoForge() {
         ManasCoreStorage.init();
-        NeoForge.EVENT_BUS.addListener(ManasCoreStorageNeoForge::onPlayerStartTracking);
+        var neoEventBus = NeoForge.EVENT_BUS;
+        neoEventBus.addListener(ManasCoreStorageNeoForge::onPlayerStartTrackingEntity);
+        neoEventBus.addListener(ManasCoreStorageNeoForge::onPlayerStartTrackingChunk);
     }
 
-    private static void onPlayerStartTracking(PlayerEvent.StartTracking event) {
+    private static void onPlayerStartTrackingEntity(PlayerEvent.StartTracking event) {
         if (event.getEntity() instanceof ServerPlayer player) {
             StorageManager.syncTarget(event.getTarget(), player);
         }
+    }
+
+    private static void onPlayerStartTrackingChunk(ChunkWatchEvent.Sent e) {
+        StorageManager.syncTarget(e.getChunk(), e.getPlayer());
     }
 }

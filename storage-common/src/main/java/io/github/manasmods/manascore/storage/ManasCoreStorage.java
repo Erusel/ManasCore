@@ -17,7 +17,5 @@ public final class ManasCoreStorage {
     public static void init() {
         ManasStorageNetwork.init();
         LifecycleEvent.SETUP.register(StorageManager::init);
-        // FIXME - Client chunk data is desynced when reconnecting to a server
-        // FIXME - Client world data is desynced when changing dimensions
     }
 }

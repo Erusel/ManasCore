@@ -38,12 +38,19 @@ public final class StorageManager {
         PlayerEvent.PLAYER_JOIN.register(player -> {
             player.manasCore$sync(player);
             ServerLevel level = player.serverLevel();
-            level.getChunkAt(player.blockPosition()).manasCore$sync(player);
             level.manasCore$sync(player);
         });
         // Synchronization on respawn and dimension change
-        PlayerEvent.PLAYER_RESPAWN.register((player, b, removalReason) -> syncTracking(player));
-        PlayerEvent.CHANGE_DIMENSION.register((serverPlayer, resourceKey, resourceKey1) -> syncTracking(serverPlayer));
+        PlayerEvent.PLAYER_RESPAWN.register((player, b, removalReason) -> {
+            player.manasCore$sync(player);
+            ServerLevel level = player.serverLevel();
+            level.manasCore$sync(player);
+        });
+        PlayerEvent.CHANGE_DIMENSION.register((player, resourceKey, resourceKey1) -> {
+            player.manasCore$sync(player);
+            ServerLevel level = player.serverLevel();
+            level.manasCore$sync(player);
+        });
 
         // Copy storage from old player to new player
         PlayerEvent.PLAYER_CLONE.register((oldPlayer, newPlayer, wonGame) -> newPlayer.manasCore$setCombinedStorage(oldPlayer.manasCore$getCombinedStorage()));
