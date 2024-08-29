@@ -3,16 +3,17 @@
  * GNU General Public License 3
  */
 
-package io.github.manasmods.manascore.testing;
+package io.github.manasmods.manascore.testing.module;
 
-import io.github.manasmods.manascore.storage.api.Storage;
-import io.github.manasmods.manascore.storage.api.StorageEvents;
-import io.github.manasmods.manascore.storage.api.StorageHolder;
-import io.github.manasmods.manascore.storage.api.StorageKey;
 import dev.architectury.event.EventResult;
 import dev.architectury.event.events.common.ChatEvent;
 import dev.architectury.event.events.common.EntityEvent;
 import dev.architectury.event.events.common.PlayerEvent;
+import io.github.manasmods.manascore.storage.api.Storage;
+import io.github.manasmods.manascore.storage.api.StorageEvents;
+import io.github.manasmods.manascore.storage.api.StorageHolder;
+import io.github.manasmods.manascore.storage.api.StorageKey;
+import io.github.manasmods.manascore.testing.ModuleConstants;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
