@@ -1,0 +1,8 @@
+{
+  "injected_interfaces": {
+    "net/minecraft/class_490": [
+      "io/github/manasmods/manascore/inventory/api/InventoryTabScreen"
+    ]
+  },
+  "accessWidener": "manascore_inventory.accesswidener"
+}

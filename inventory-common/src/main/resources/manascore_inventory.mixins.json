@@ -1,0 +1,13 @@
+{
+  "required": true,
+  "package": "io.github.manasmods.manascore.inventory.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "minVersion": "0.8",
+  "client": [
+    "MixinInventoryScreen"
+  ],
+  "mixins": [],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
