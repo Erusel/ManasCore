@@ -5,7 +5,7 @@ import type * as Preset from '@docusaurus/preset-classic';
 const config: Config = {
     title: 'ManasCore',
     tagline: 'Simple and modular library for Minecraft mods',
-    favicon: 'img/favicon.ico',
+    favicon: 'img/manascore.ico',
     url: 'https://manasmods.github.io',
     baseUrl: '/ManasCore/',
     organizationName: 'ManasMods',
@@ -44,10 +44,10 @@ const config: Config = {
         // Replace with your project's social card
         image: 'img/docusaurus-social-card.jpg',
         navbar: {
-            title: 'ManasCore Docs',
+            title: 'ManasCore',
             logo: {
-                alt: 'My Site Logo',
-                src: 'img/logo.svg',
+                alt: 'Logo',
+                src: 'img/manascore.svg',
             },
             items: [
                 {
