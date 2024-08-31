@@ -20,3 +20,5 @@ Most of the base configuration is done in the project wide `build.gradle` file.
       ```properties
       loom.platform=neoforge
       ```
+
+Example Commit for a module initiallization: https://github.com/ManasMods/ManasCore/commit/db92a894268b41977a364faff05e4ce055085976
