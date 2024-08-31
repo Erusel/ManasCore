@@ -11,7 +11,7 @@
     "homepage": ""
   },
   "license": "${license}",
-  "icon": "assets/manascore/icon.jpg",
+  "icon": "assets/manascore/icon.png",
   "environment": "*",
   "entrypoints": {
     "main": [
