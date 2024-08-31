@@ -5,8 +5,9 @@
 
 ext {
     includedProjects = [
-        ":network",
-        ":storage"
+            ":network",
+            ":storage",
+            ":inventory-tabs"
     ]
 }
 
