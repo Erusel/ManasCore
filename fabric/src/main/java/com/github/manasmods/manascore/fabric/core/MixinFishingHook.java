@@ -6,18 +6,22 @@ import com.github.manasmods.manascore.utils.Changeable;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.minecraft.world.entity.projectile.FishingHook;
+import net.minecraft.world.entity.projectile.ProjectileDeflection;
 import net.minecraft.world.phys.HitResult;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
+import java.util.Objects;
+
 @Mixin(FishingHook.class)
 public abstract class MixinFishingHook {
-    @WrapOperation(method = "checkCollision", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/projectile/FishingHook;onHit(Lnet/minecraft/world/phys/HitResult;)V"))
-    void onHit(FishingHook instance, HitResult result, Operation<Void> original) {
+
+    @WrapOperation(method = "checkCollision", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/world/entity/projectile/FishingHook;hitTargetOrDeflectSelf(Lnet/minecraft/world/phys/HitResult;)Lnet/minecraft/world/entity/projectile/ProjectileDeflection;"))
+    ProjectileDeflection onHit(FishingHook instance, HitResult result, Operation<ProjectileDeflection> original) {
         Changeable<ProjectileHitResult> resultChangeable = Changeable.of(ProjectileHitResult.DEFAULT);
         EntityEvents.PROJECTILE_HIT.invoker().hit(result, instance, resultChangeable);
-
-        if (!resultChangeable.get().equals(ProjectileHitResult.DEFAULT)) return;
-        original.call(instance, result);
+        if (!Objects.equals(resultChangeable.get(), ProjectileHitResult.DEFAULT)) return null;
+        return original.call(instance, result);
     }
 }

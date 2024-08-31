@@ -25,15 +25,15 @@ public class StorageTest {
     public static void init() {
         // Register storage
         StorageEvents.REGISTER_ENTITY_STORAGE.register(registry -> {
-            ENTITY_KEY = registry.register(new ResourceLocation(TestMod.MOD_ID, "test_storage"), TestStorage.class, entity -> entity instanceof Player, TestStorage::new);
+            ENTITY_KEY = registry.register(ResourceLocation.fromNamespaceAndPath(TestMod.MOD_ID, "test_storage"), TestStorage.class, entity -> entity instanceof Player, TestStorage::new);
             ManasCore.Logger.info("Registered entity storage key: {}", ENTITY_KEY.id());
         });
         StorageEvents.REGISTER_CHUNK_STORAGE.register(registry -> {
-            CHUNK_KEY = registry.register(new ResourceLocation(TestMod.MOD_ID, "test_storage"), TestStorage.class, chunk -> true, TestStorage::new);
+            CHUNK_KEY = registry.register(ResourceLocation.fromNamespaceAndPath(TestMod.MOD_ID, "test_storage"), TestStorage.class, chunk -> true, TestStorage::new);
             ManasCore.Logger.info("Registered chunk storage key: {}", CHUNK_KEY.id());
         });
         StorageEvents.REGISTER_WORLD_STORAGE.register(registry -> {
-            WORLD_KEY = registry.register(new ResourceLocation(TestMod.MOD_ID, "test_storage"), TestStorage.class, level -> true, TestStorage::new);
+            WORLD_KEY = registry.register(ResourceLocation.fromNamespaceAndPath(TestMod.MOD_ID, "test_storage"), TestStorage.class, level -> true, TestStorage::new);
             ManasCore.Logger.info("Registered world storage key: {}", WORLD_KEY.id());
         });
         // Register event listeners that change the storage

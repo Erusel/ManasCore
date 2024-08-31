@@ -6,18 +6,22 @@ import com.github.manasmods.manascore.utils.Changeable;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.minecraft.world.entity.projectile.AbstractHurtingProjectile;
+import net.minecraft.world.entity.projectile.ProjectileDeflection;
 import net.minecraft.world.phys.HitResult;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
+import java.util.Objects;
+
 @Mixin(AbstractHurtingProjectile.class)
 public abstract class MixinAbstractHurtingProjectile {
-    @WrapOperation(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/projectile/AbstractHurtingProjectile;onHit(Lnet/minecraft/world/phys/HitResult;)V"))
-    void onHit(AbstractHurtingProjectile instance, HitResult result, Operation<Void> original) {
+
+    @WrapOperation(method = "tick", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/world/entity/projectile/AbstractHurtingProjectile;hitTargetOrDeflectSelf(Lnet/minecraft/world/phys/HitResult;)Lnet/minecraft/world/entity/projectile/ProjectileDeflection;"))
+    ProjectileDeflection onHit(AbstractHurtingProjectile instance, HitResult result, Operation<ProjectileDeflection> original) {
         Changeable<ProjectileHitResult> resultChangeable = Changeable.of(ProjectileHitResult.DEFAULT);
         EntityEvents.PROJECTILE_HIT.invoker().hit(result, instance, resultChangeable);
-
-        if (!resultChangeable.get().equals(ProjectileHitResult.DEFAULT)) return;
-        original.call(instance, result);
+        if (!Objects.equals(resultChangeable.get(), ProjectileHitResult.DEFAULT)) return null;
+        return original.call(instance, result);
     }
 }

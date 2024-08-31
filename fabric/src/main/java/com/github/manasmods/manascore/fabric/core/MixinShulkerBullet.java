@@ -5,19 +5,23 @@ import com.github.manasmods.manascore.api.world.entity.EntityEvents.ProjectileHi
 import com.github.manasmods.manascore.utils.Changeable;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import net.minecraft.world.entity.projectile.ProjectileDeflection;
 import net.minecraft.world.entity.projectile.ShulkerBullet;
 import net.minecraft.world.phys.HitResult;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
+import java.util.Objects;
+
 @Mixin(ShulkerBullet.class)
 public abstract class MixinShulkerBullet {
-    @WrapOperation(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/projectile/ShulkerBullet;onHit(Lnet/minecraft/world/phys/HitResult;)V"))
-    void onHit(ShulkerBullet instance, HitResult result, Operation<Void> original) {
+
+    @WrapOperation(method = "tick", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/world/entity/projectile/ShulkerBullet;hitTargetOrDeflectSelf(Lnet/minecraft/world/phys/HitResult;)Lnet/minecraft/world/entity/projectile/ProjectileDeflection;"))
+    ProjectileDeflection onHit(ShulkerBullet instance, HitResult result, Operation<ProjectileDeflection> original) {
         Changeable<ProjectileHitResult> resultChangeable = Changeable.of(ProjectileHitResult.DEFAULT);
         EntityEvents.PROJECTILE_HIT.invoker().hit(result, instance, resultChangeable);
-
-        if (!resultChangeable.get().equals(ProjectileHitResult.DEFAULT)) return;
-        original.call(instance, result);
+        if (!Objects.equals(resultChangeable.get(), ProjectileHitResult.DEFAULT)) return null;
+        return original.call(instance, result);
     }
 }

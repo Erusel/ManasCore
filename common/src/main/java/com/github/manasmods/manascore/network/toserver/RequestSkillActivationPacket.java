@@ -46,6 +46,7 @@ public class RequestSkillActivationPacket {
                     skill.onPressed(player, keyNumber);
                     storage.markDirty();
 
+                    skill.addHeldAttributeModifiers(player);
                     SkillStorage.tickingSkills.put(player.getUUID(), new TickingSkill(skill.getSkill()));
                 });
             }

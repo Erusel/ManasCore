@@ -8,7 +8,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier.Builder;
 import net.neoforged.bus.api.IEventBus;
-import net.neoforged.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.neoforged.fml.ModLoadingContext;
 import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;
 import net.neoforged.neoforge.event.entity.EntityAttributeModificationEvent;
 
@@ -64,7 +64,7 @@ public class ManasAttributeRegistryImpl {
 
     @SuppressWarnings({"removal", "deprecation"})
     public static void init() {
-        IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
+        IEventBus modEventBus = ModLoadingContext.get().getActiveContainer().getEventBus();
         modEventBus.addListener(ManasAttributeRegistryImpl::registerAttributes);
         modEventBus.addListener(ManasAttributeRegistryImpl::registerNewAttributes);
     }

@@ -46,7 +46,7 @@ public class SkillStorage extends Storage implements Skills {
     private static final String SKILL_LIST_KEY = "skills";
 
     public static void init() {
-        StorageEvents.REGISTER_ENTITY_STORAGE.register(registry -> key = registry.register(new ResourceLocation(ManasCore.MOD_ID, "skill_storage"), SkillStorage.class, LivingEntity.class::isInstance, target -> new SkillStorage((LivingEntity) target)));
+        StorageEvents.REGISTER_ENTITY_STORAGE.register(registry -> key = registry.register(ResourceLocation.fromNamespaceAndPath(ManasCore.MOD_ID, "skill_storage"), SkillStorage.class, LivingEntity.class::isInstance, target -> new SkillStorage((LivingEntity) target)));
         EntityEvents.LIVING_POST_TICK.register(entity -> {
             Level level = entity.level();
             if (level.isClientSide()) return;
@@ -73,7 +73,7 @@ public class SkillStorage extends Storage implements Skills {
 
     private static void tickSkills(LivingEntity entity, Skills storage) {
         List<ManasSkillInstance> tickingSkills = new ArrayList<>();
-        for (ManasSkillInstance instance : storage.getLearnedSkills()) {
+        for (ManasSkillInstance instance : List.copyOf(storage.getLearnedSkills())) {
             Optional<ManasSkillInstance> optional = storage.getSkill(instance.getSkill());
             if (optional.isEmpty()) continue;
 
@@ -110,7 +110,11 @@ public class SkillStorage extends Storage implements Skills {
 
     private static void handleSkillHeldTick(Player player, Skills storage) {
         if (!tickingSkills.containsKey(player.getUUID())) return;
-        tickingSkills.get(player.getUUID()).removeIf(skill -> !skill.tick(storage, player));
+        tickingSkills.get(player.getUUID()).removeIf(skill -> {
+            boolean tick = skill.tick(storage, player);
+            if (!tick) skill.getSkill().removeHeldAttributeModifiers(player);
+            return !tick;
+        });
     }
 
     private final Map<ResourceLocation, ManasSkillInstance> skillInstances = new HashMap<>();
@@ -170,18 +174,20 @@ public class SkillStorage extends Storage implements Skills {
         markDirty();
     }
 
-    public void handleSkillRelease(List<ResourceLocation> skillList, int heldTick, int keyNumber) {
+    public void handleSkillRelease(List<ResourceLocation> skillList, Player player, int heldTick, int keyNumber) {
         for (final ResourceLocation skillId : skillList) {
             getSkill(skillId).ifPresent(skill -> {
                 if (!skill.canInteractSkill(getOwner())) return;
-                if (skill.onCoolDown() && !skill.canIgnoreCoolDown(getOwner())) return;
-                skill.onRelease(getOwner(), heldTick, keyNumber);
-                if (skill.isDirty()) markDirty();
+
+                if (!skill.onCoolDown() || skill.canIgnoreCoolDown(getOwner())) {
+                    skill.onRelease(getOwner(), heldTick, keyNumber);
+                    if (skill.isDirty()) markDirty();
+                }
 
                 UUID ownerID = getOwner().getUUID();
-                if (tickingSkills.containsKey(ownerID)) {
+                if (tickingSkills.containsKey(ownerID))
                     tickingSkills.get(ownerID).removeIf(tickingSkill -> tickingSkill.getSkill() == skill.getSkill());
-                }
+                skill.getSkill().removeHeldAttributeModifiers(player);
             });
         }
     }

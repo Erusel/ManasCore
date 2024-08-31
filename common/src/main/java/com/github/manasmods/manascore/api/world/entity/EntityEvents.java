@@ -13,9 +13,9 @@ public interface EntityEvents {
     Event<LivingTickEvent> LIVING_PRE_TICK = EventFactory.createLoop();
     Event<LivingTickEvent> LIVING_POST_TICK = EventFactory.createLoop();
     Event<LivingChangeTargetEvent> LIVING_CHANGE_TARGET = EventFactory.createEventResult();
-    Event<LivingAttackEvent> LIVING_ATTACK = EventFactory.createEventResult();
-    Event<LivingHurtEvent> LIVING_HURT = EventFactory.createEventResult();
-    Event<LivingDamageEvent> LIVING_DAMAGE = EventFactory.createEventResult();
+    Event<LivingAttackEvent> LIVING_ATTACK = EventFactory.createEventResult(); //When attacked, before any check like Immunity, Fire Resistance
+    Event<LivingHurtEvent> LIVING_HURT = EventFactory.createEventResult(); //When hurt, before armor and enchantment effect check
+    Event<LivingDamageEvent> LIVING_DAMAGE = EventFactory.createEventResult(); //When damaged, after every possible check
     Event<ProjectileHitEvent> PROJECTILE_HIT = EventFactory.createLoop();
 
 

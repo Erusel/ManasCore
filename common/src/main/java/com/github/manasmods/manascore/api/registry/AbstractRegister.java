@@ -7,14 +7,13 @@ import com.mojang.datafixers.types.Type;
 import dev.architectury.registry.registries.DeferredRegister;
 import dev.architectury.registry.registries.RegistrySupplier;
 import lombok.NonNull;
+import net.minecraft.core.Holder;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.EntityDimensions;
-import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.EntityType.EntityFactory;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.RangedAttribute;
@@ -29,11 +28,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType.BlockEntitySupplie
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -201,6 +196,11 @@ public abstract class AbstractRegister<R extends AbstractRegister<R>> {
         public RegistrySupplier<T> end() {
             return this.register.items.register(this.id, () -> this.itemFactory.apply(this.properties));
         }
+
+        @Override
+        public Holder<T> endAsHolder() {
+            return this.end().getRegistrar().getHolder(this.id);
+        }
     }
 
     /**
@@ -248,6 +248,11 @@ public abstract class AbstractRegister<R extends AbstractRegister<R>> {
             if (this.parentBlockRegistryEntry == null) throw new IllegalStateException("Parent block registry entry must not be null!");
             return this.register.items.register(this.id, () -> this.itemFactory.apply(this.parentBlockRegistryEntry, this.properties));
         }
+
+        @Override
+        public Holder<T> endAsHolder() {
+            return this.end().getRegistrar().getHolder(this.id);
+        }
     }
 
     /**
@@ -291,6 +296,11 @@ public abstract class AbstractRegister<R extends AbstractRegister<R>> {
             this.blockItemBuilder.setParentBlockRegistryEntry(blockSupplier);
             this.blockItemBuilder.end();
             return blockSupplier;
+        }
+
+        @Override
+        public Holder<T> endAsHolder() {
+            return this.end().getRegistrar().getHolder(this.id);
         }
 
         @FunctionalInterface
@@ -384,7 +394,7 @@ public abstract class AbstractRegister<R extends AbstractRegister<R>> {
             RegistrySupplier<EntityType<T>> supplier = this.register.entityTypes.register(this.id, () -> {
                 EntityType.Builder<T> builder = EntityType.Builder.of(this.entityFactory, this.category)
                         .clientTrackingRange(this.trackingRange)
-                        .sized(this.dimensions.width, this.dimensions.height)
+                        .sized(this.dimensions.width(), this.dimensions.height())
                         .updateInterval(this.updateInterval);
 
                 if (!this.summonable) builder.noSummon();
@@ -399,25 +409,30 @@ public abstract class AbstractRegister<R extends AbstractRegister<R>> {
             supplier.listen(type -> ManasAttributeRegistry.registerNew(() -> type, this.attributeBuilder));
             return supplier;
         }
+
+        @Override
+        public Holder<EntityType<T>> endAsHolder() {
+            return this.end().getRegistrar().getHolder(this.id);
+        }
     }
 
     /**
-     * Builder class for {@link RangedAttribute}s.
+     * Builder class for {@link Attribute}s.
      */
-    public static class AttributeBuilder<R extends AbstractRegister<R>> extends ContentBuilder<RangedAttribute, R> {
+    public static class AttributeBuilder<R extends AbstractRegister<R>> extends ContentBuilder<Attribute, R> {
         protected double defaultValue;
         protected double minimumValue;
         protected double maximumValue;
 
         protected boolean syncable;
-        protected Map<Supplier<EntityType<? extends LivingEntity>>, Double> applicableEntityTypes;
+        protected Map<Supplier<EntityType<? extends Entity>>, Double> applicableEntityTypes;
         protected boolean applyToAll = false;
 
         private AttributeBuilder(R register, String name) {
             super(register, name);
             this.defaultValue = 1;
             this.minimumValue = 0;
-            this.maximumValue = 1_000_000;
+            this.maximumValue = 100_000_000_000D;
             this.syncable = false;
             this.applicableEntityTypes = new HashMap<>();
         }
@@ -457,7 +472,7 @@ public abstract class AbstractRegister<R extends AbstractRegister<R>> {
         /**
          * Applies the attribute to all given entities with the default value.
          */
-        public AttributeBuilder<R> applyTo(double defaultValue, Supplier<EntityType<? extends LivingEntity>> entityType) {
+        public AttributeBuilder<R> applyTo(double defaultValue, Supplier<EntityType<? extends Entity>> entityType) {
             this.applicableEntityTypes.put(entityType, defaultValue);
             return this;
         }
@@ -465,7 +480,7 @@ public abstract class AbstractRegister<R extends AbstractRegister<R>> {
         /**
          * Applies the attribute to all given entities with the default value.
          */
-        public AttributeBuilder<R> applyTo(Supplier<EntityType<? extends LivingEntity>> entityType) {
+        public AttributeBuilder<R> applyTo(Supplier<EntityType<? extends Entity>> entityType) {
             return applyTo(this.defaultValue, entityType);
         }
 
@@ -473,8 +488,8 @@ public abstract class AbstractRegister<R extends AbstractRegister<R>> {
          * Applies the attribute to all given entities with the default value.
          */
         @SafeVarargs
-        public final AttributeBuilder<R> applyTo(double defaultValue, Supplier<EntityType<? extends LivingEntity>>... entityType) {
-            for (Supplier<EntityType<? extends LivingEntity>> typeSupplier : entityType) {
+        public final AttributeBuilder<R> applyTo(double defaultValue, Supplier<EntityType<? extends Entity>>... entityType) {
+            for (Supplier<EntityType<? extends Entity>> typeSupplier : entityType) {
                 this.applicableEntityTypes.put(typeSupplier, defaultValue);
             }
             return this;
@@ -484,15 +499,15 @@ public abstract class AbstractRegister<R extends AbstractRegister<R>> {
          * Applies the attribute to all given entities with the default value.
          */
         @SafeVarargs
-        public final AttributeBuilder<R> applyTo(Supplier<EntityType<? extends LivingEntity>>... entityType) {
+        public final AttributeBuilder<R> applyTo(Supplier<EntityType<? extends Entity>>... entityType) {
             return applyTo(this.defaultValue, entityType);
         }
 
         /**
          * Applies the attribute to all given entities with the default value.
          */
-        public AttributeBuilder<R> applyTo(double defaultValue, List<Supplier<EntityType<? extends LivingEntity>>> entityTypes) {
-            for (Supplier<EntityType<? extends LivingEntity>> typeSupplier : entityTypes) {
+        public AttributeBuilder<R> applyTo(double defaultValue, List<Supplier<EntityType<? extends Entity>>> entityTypes) {
+            for (Supplier<EntityType<? extends Entity>> typeSupplier : entityTypes) {
                 this.applicableEntityTypes.put(typeSupplier, defaultValue);
             }
             return this;
@@ -501,7 +516,7 @@ public abstract class AbstractRegister<R extends AbstractRegister<R>> {
         /**
          * Applies the attribute to all given entities with the default value.
          */
-        public AttributeBuilder<R> applyTo(List<Supplier<EntityType<? extends LivingEntity>>> entityTypes) {
+        public AttributeBuilder<R> applyTo(List<Supplier<EntityType<? extends Entity>>> entityTypes) {
             return applyTo(this.defaultValue, entityTypes);
         }
 
@@ -514,16 +529,25 @@ public abstract class AbstractRegister<R extends AbstractRegister<R>> {
         }
 
         @Override
-        public RegistrySupplier<RangedAttribute> end() {
-            RegistrySupplier<RangedAttribute> supplier = this.register.attributes.register(this.id, () -> (RangedAttribute) new RangedAttribute(String.format("%s.attribute.%s", this.id.getNamespace(), this.id.getPath().replaceAll("/", ".")), this.defaultValue, this.minimumValue, this.maximumValue).setSyncable(this.syncable));
+        public RegistrySupplier<Attribute> end() {
+            Attribute attribute = new RangedAttribute(String.format("%s.attribute.%s", this.id.getNamespace(),
+                            this.id.getPath().replaceAll("/", ".")),
+                            this.defaultValue, this.minimumValue, this.maximumValue).setSyncable(this.syncable);
 
-            supplier.listen(attribute -> {
-                // TODO something in here is broken on NeoForge and probably on Forge too
-                if (this.applyToAll) ManasAttributeRegistry.registerToAll(builder -> builder.add(attribute, this.defaultValue));
-                this.applicableEntityTypes.forEach((typeSupplier, defaultValue) -> ManasAttributeRegistry.register(typeSupplier, builder -> builder.add(attribute, defaultValue)));
-            });
+            Holder<Attribute> holder = Registry.registerForHolder(BuiltInRegistries.ATTRIBUTE, this.id, attribute);
+            RegistrySupplier<Attribute> supplier = this.register.attributes.register(this.id, () -> attribute);
 
+            if (this.applyToAll) { //registerToAll doesn't work
+                //ManasAttributeRegistry.registerToAll(builder -> builder.add(holder, this.defaultValue));
+                BuiltInRegistries.ENTITY_TYPE.stream().forEach(type ->
+                        ManasAttributeRegistry.register(() -> type, builder -> builder.add(holder, defaultValue)));
+            } else this.applicableEntityTypes.forEach((typeSupplier, defaultValue) ->
+                    ManasAttributeRegistry.register(typeSupplier, builder -> builder.add(holder, defaultValue)));
             return supplier;
+        }
+
+        public Holder<Attribute> endAsHolder() {
+            return this.end().getRegistrar().getHolder(this.id);
         }
     }
 
@@ -564,6 +588,11 @@ public abstract class AbstractRegister<R extends AbstractRegister<R>> {
         public RegistrySupplier<BlockEntityType<T>> end() {
             return this.register.blockEntities.register(this.id, () -> BlockEntityType.Builder.of(this.factory, this.validBlocks.stream().map(Supplier::get).toArray(Block[]::new)).build(this.dataFixerType));
         }
+
+        @Override
+        public Holder<BlockEntityType<T>> endAsHolder() {
+            return this.end().getRegistrar().getHolder(this.id);
+        }
     }
 
     public static class SkillBuilder<R extends AbstractRegister<R>, T extends ManasSkill> extends ContentBuilder<T, R> {
@@ -578,6 +607,11 @@ public abstract class AbstractRegister<R extends AbstractRegister<R>> {
         public RegistrySupplier<T> end() {
             return this.register.skills.register(this.id, this.skillFactory);
         }
+
+        @Override
+        public Holder<T> endAsHolder() {
+            return this.end().getRegistrar().getHolder(this.id);
+        }
     }
 
     /**
@@ -590,7 +624,7 @@ public abstract class AbstractRegister<R extends AbstractRegister<R>> {
 
         private ContentBuilder(final R register, final String name) {
             this.register = register;
-            this.id = new ResourceLocation(this.register.modId, name);
+            this.id = ResourceLocation.fromNamespaceAndPath(register.modId, name);
         }
 
         public R build() {
@@ -599,5 +633,6 @@ public abstract class AbstractRegister<R extends AbstractRegister<R>> {
         }
 
         public abstract RegistrySupplier<T> end();
+        public abstract Holder<T> endAsHolder();
     }
 }

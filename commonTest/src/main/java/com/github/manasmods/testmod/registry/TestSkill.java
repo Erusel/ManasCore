@@ -12,6 +12,8 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.animal.IronGolem;
 import net.minecraft.world.entity.monster.Creeper;
 import net.minecraft.world.entity.monster.Spider;
@@ -25,6 +27,7 @@ public class TestSkill extends ManasSkill {
     public TestSkill() {
         super(SkillRarity.Unique);
         ManasCore.Logger.info("Created skill!");
+        this.addHeldAttributeModifier(Attributes.MOVEMENT_SPEED, "test_skill", 2.0F, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
     }
 
     public boolean canBeToggled(ManasSkillInstance instance, LivingEntity entity) {
@@ -114,7 +117,7 @@ public class TestSkill extends ManasSkill {
         if (projectile instanceof ThrownTrident) {
             ManasCore.Logger.info("Dodged");
             result.set(EntityEvents.ProjectileHitResult.PASS);
-        }
+        } else result.set(EntityEvents.ProjectileHitResult.HIT_NO_DAMAGE);
     }
 
     public boolean onDeath(ManasSkillInstance instance, LivingEntity owner, DamageSource source) {

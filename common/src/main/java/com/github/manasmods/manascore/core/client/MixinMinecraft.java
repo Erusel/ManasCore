@@ -20,7 +20,7 @@ public class MixinMinecraft {
             target = "Lnet/minecraft/client/player/LocalPlayer;resetAttackStrengthTicker()V", shift = At.Shift.BEFORE))
     private void addSweepChance(CallbackInfoReturnable<Boolean> cir) {
         if (player == null) return;
-        AttributeInstance instance = player.getAttribute(ManasCoreAttributes.SWEEP_CHANCE.get());
+        AttributeInstance instance = player.getAttribute(ManasCoreAttributes.SWEEP_CHANCE);
         if (instance == null || player.getRandom().nextInt(100) > instance.getValue()) return;
         NetworkManager.CHANNEL.sendToServer(new RequestSweepChancePacket());
     }
