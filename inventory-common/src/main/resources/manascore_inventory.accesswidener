@@ -1,5 +1,12 @@
 accessWidener v2 named
 
-accessible field net/minecraft/client/gui/screens/inventory/AbstractContainerScreen leftPos I
-accessible field net/minecraft/client/gui/screens/inventory/AbstractContainerScreen topPos I
-accessible field net/minecraft/client/gui/screens/inventory/AbstractContainerScreen imageWidth I
+transitive-accessible field net/minecraft/client/gui/screens/inventory/AbstractContainerScreen leftPos I
+transitive-accessible field net/minecraft/client/gui/screens/inventory/AbstractContainerScreen topPos I
+transitive-accessible field net/minecraft/client/gui/screens/inventory/AbstractContainerScreen imageWidth I
+
+transitive-accessible field net/minecraft/client/gui/screens/inventory/CreativeModeInventoryScreen UNSELECTED_TOP_TABS [Lnet/minecraft/resources/ResourceLocation;
+transitive-accessible field net/minecraft/client/gui/screens/inventory/CreativeModeInventoryScreen SELECTED_TOP_TABS [Lnet/minecraft/resources/ResourceLocation;
+transitive-accessible field net/minecraft/client/gui/screens/inventory/CreativeModeInventoryScreen UNSELECTED_BOTTOM_TABS [Lnet/minecraft/resources/ResourceLocation;
+transitive-accessible field net/minecraft/client/gui/screens/inventory/CreativeModeInventoryScreen SELECTED_BOTTOM_TABS [Lnet/minecraft/resources/ResourceLocation;
+transitive-accessible field net/minecraft/client/gui/screens/inventory/CreativeModeInventoryScreen TAB_WIDTH I
+transitive-accessible field net/minecraft/client/gui/screens/inventory/CreativeModeInventoryScreen TAB_HEIGHT I

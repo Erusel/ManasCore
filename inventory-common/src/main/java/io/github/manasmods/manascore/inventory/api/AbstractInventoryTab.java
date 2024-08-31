@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2024. ManasMods
+ * GNU General Public License 3
+ */
+
 package io.github.manasmods.manascore.inventory.api;
 
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -7,19 +12,19 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Tooltip;
-import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 
 public abstract class AbstractInventoryTab extends Button implements InventoryTab {
-    protected static final int TAB_WIDTH = 28;
-    protected static final int TAB_HEIGHT = 32;
+    public static final int TABS_PER_ROW = 7;
     protected final Minecraft minecraft;
     @Getter
     @Setter
-    private TabPosition position;
+    private int currentTabIndex;
 
     public AbstractInventoryTab(Tooltip tooltip) {
-        super(0, 0, TAB_WIDTH, TAB_HEIGHT, Component.empty(), button -> {
+        super(0, 0, CreativeModeInventoryScreen.TAB_WIDTH, CreativeModeInventoryScreen.TAB_HEIGHT, Component.empty(), button -> {
             AbstractInventoryTab tab = (AbstractInventoryTab) button;
             tab.sendOpenContainerPacket();
         }, Button.DEFAULT_NARRATION);
@@ -42,9 +47,12 @@ public abstract class AbstractInventoryTab extends Button implements InventoryTa
     protected abstract void renderIcon(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks);
 
     protected void renderBg(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
-        RenderSystem.setShader(GameRenderer::getPositionTexShader);
-        float yOffset = this.isCurrent() ? TAB_HEIGHT : 0F;
-        guiGraphics.blit(this.position.texture(), this.getX(), this.getY(), TAB_WIDTH, TAB_HEIGHT, 0F, yOffset, TAB_WIDTH, TAB_HEIGHT - 1, TAB_WIDTH, TAB_HEIGHT * 2);
+        ResourceLocation[] textureSource = this.currentTabIndex < TABS_PER_ROW
+                ? isCurrent() ? CreativeModeInventoryScreen.SELECTED_TOP_TABS : CreativeModeInventoryScreen.UNSELECTED_TOP_TABS
+                : isCurrent() ? CreativeModeInventoryScreen.SELECTED_BOTTOM_TABS : CreativeModeInventoryScreen.UNSELECTED_BOTTOM_TABS;
+        int textureIndex = this.currentTabIndex % TABS_PER_ROW;
+        ResourceLocation texture = textureSource[textureIndex];
+        guiGraphics.blitSprite(texture, this.getX(), this.getY(), CreativeModeInventoryScreen.TAB_WIDTH, CreativeModeInventoryScreen.TAB_HEIGHT);
     }
 
     public boolean isCurrent() {

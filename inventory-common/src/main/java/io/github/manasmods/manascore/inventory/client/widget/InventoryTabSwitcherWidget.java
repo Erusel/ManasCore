@@ -1,13 +1,15 @@
+/*
+ * Copyright (c) 2024. ManasMods
+ * GNU General Public License 3
+ */
+
 package io.github.manasmods.manascore.inventory.client.widget;
 
 import io.github.manasmods.manascore.inventory.api.AbstractInventoryTab;
-import io.github.manasmods.manascore.inventory.api.TabPosition;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.components.Renderable;
-import net.minecraft.client.gui.components.events.GuiEventListener;
-import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
@@ -16,7 +18,7 @@ import org.lwjgl.glfw.GLFW;
 import java.awt.*;
 import java.util.TreeMap;
 
-public class InventoryTabSwitcherWidget implements Renderable, GuiEventListener, NarratableEntry {
+public class InventoryTabSwitcherWidget extends AbstractWidget {
     private int page = 1;
     private final int maxPages;
     private final Button prevButton, nextButton;
@@ -25,6 +27,7 @@ public class InventoryTabSwitcherWidget implements Renderable, GuiEventListener,
     private boolean isFocused = false;
 
     public InventoryTabSwitcherWidget(AbstractContainerScreen parent, int maxPages) {
+        super(0,0,parent.width, 0, Component.empty());
         this.parent = parent;
         this.maxPages = maxPages;
         this.prevButton = Button.builder(Component.literal("<"), pButton -> {
@@ -44,7 +47,7 @@ public class InventoryTabSwitcherWidget implements Renderable, GuiEventListener,
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+    protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
         if (page > 1) {
             this.prevButton.render(guiGraphics, mouseX, mouseY, partialTicks);
         }
@@ -66,8 +69,8 @@ public class InventoryTabSwitcherWidget implements Renderable, GuiEventListener,
     public void updateTabs() {
         this.tabs.forEach((integer, widget) -> {
             int tabScreenIndex = integer;
-            while (tabScreenIndex > 12) {
-                tabScreenIndex -= 12;
+            while (tabScreenIndex > AbstractInventoryTab.TABS_PER_ROW * 2) {
+                tabScreenIndex -= AbstractInventoryTab.TABS_PER_ROW * 2;
             }
 
             final int yOffset = 4;
@@ -77,42 +80,42 @@ public class InventoryTabSwitcherWidget implements Renderable, GuiEventListener,
                 case 1 -> {
                     widget.setX(parent.leftPos);
                     widget.setY(parent.topPos - widget.getHeight() + yOffset);
-                    widget.setPosition(TabPosition.LEFT_TOP);
+                    widget.setCurrentTabIndex(tabScreenIndex);
                 }
                 case 2, 3 -> {
                     widget.setX(parent.leftPos + widget.getWidth() * (tabScreenIndex - 1) + (xOffset * tabScreenIndex - 1) + 1);
                     widget.setY(parent.topPos - widget.getHeight() + yOffset);
-                    widget.setPosition(TabPosition.TOP);
+                    widget.setCurrentTabIndex(tabScreenIndex);
                 }
                 case 4, 5 -> {
                     widget.setX(parent.leftPos + widget.getWidth() * (tabScreenIndex - 1) + (xOffset * tabScreenIndex - 1) + 2);
                     widget.setY(parent.topPos - widget.getHeight() + yOffset);
-                    widget.setPosition(TabPosition.TOP);
+                    widget.setCurrentTabIndex(tabScreenIndex);
                 }
                 case 6 -> {
                     widget.setX(parent.leftPos + widget.getWidth() * (tabScreenIndex - 1) + (xOffset * tabScreenIndex - 1) + 3);
                     widget.setY(parent.topPos - widget.getHeight() + yOffset);
-                    widget.setPosition(TabPosition.RIGHT_TOP);
+                    widget.setCurrentTabIndex(tabScreenIndex);
                 }
                 case 7 -> {
                     widget.setX(parent.leftPos);
                     widget.setY(parent.topPos + parent.imageWidth - yOffset - 11);
-                    widget.setPosition(TabPosition.LEFT_BOT);
+                    widget.setCurrentTabIndex(tabScreenIndex);
                 }
                 case 8, 9 -> {
                     widget.setX(parent.leftPos + widget.getWidth() * (tabScreenIndex - 7) + (xOffset * tabScreenIndex - 7) + 1);
                     widget.setY(parent.topPos + parent.imageWidth - yOffset - 11);
-                    widget.setPosition(TabPosition.BOT);
+                    widget.setCurrentTabIndex(tabScreenIndex);
                 }
                 case 10, 11 -> {
                     widget.setX(parent.leftPos + widget.getWidth() * (tabScreenIndex - 7) + (xOffset * tabScreenIndex - 7) + 2);
                     widget.setY(parent.topPos + parent.imageWidth - yOffset - 11);
-                    widget.setPosition(TabPosition.BOT);
+                    widget.setCurrentTabIndex(tabScreenIndex);
                 }
                 case 12 -> {
                     widget.setX(parent.leftPos + widget.getWidth() * (tabScreenIndex - 7) + (xOffset * tabScreenIndex - 7) + 3);
                     widget.setY(parent.topPos + parent.imageWidth - yOffset - 11);
-                    widget.setPosition(TabPosition.RIGHT_BOT);
+                    widget.setCurrentTabIndex(tabScreenIndex);
                 }
             }
 
@@ -156,7 +159,7 @@ public class InventoryTabSwitcherWidget implements Renderable, GuiEventListener,
     }
 
     @Override
-    public void updateNarration(NarrationElementOutput narrationElementOutput) {
+    protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
         this.nextButton.updateWidgetNarration(narrationElementOutput);
         this.prevButton.updateWidgetNarration(narrationElementOutput);
     }

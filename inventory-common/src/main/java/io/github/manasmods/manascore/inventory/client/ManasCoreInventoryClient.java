@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2024. ManasMods
+ * GNU General Public License 3
+ */
+
 package io.github.manasmods.manascore.inventory.client;
 
 import dev.architectury.event.events.client.ClientGuiEvent;
@@ -23,7 +28,7 @@ public class ManasCoreInventoryClient {
 
             tabRegistryEntries.forEach(tabSwitcherWidget::addUpdateListener);
             tabSwitcherWidget.updateTabs();
-            access.addWidget(tabSwitcherWidget);
+            access.addRenderableWidget(tabSwitcherWidget);
         });
 
         ClientLifecycleEvent.CLIENT_SETUP.register(instance -> {
