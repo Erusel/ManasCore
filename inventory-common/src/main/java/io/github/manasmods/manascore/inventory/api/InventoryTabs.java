@@ -1,7 +1,6 @@
 package io.github.manasmods.manascore.inventory.api;
 
 import io.github.manasmods.manascore.inventory.InventoryTabRegistry;
-import io.github.manasmods.manascore.inventory.api.annotation.WithInventoryTab;
 import net.minecraft.client.gui.screens.Screen;
 import org.jetbrains.annotations.Nullable;
 
@@ -26,7 +25,7 @@ public final class InventoryTabs {
 
     /**
      * Returns the registered {@link AbstractInventoryTab} Object or null.
-     * The given {@link Screen} has be annotated with @{@link WithInventoryTab} annotation to be able to find the {@link AbstractInventoryTab} in the registry.
+     * The given {@link Screen} has to extend {@link InventoryTabScreen} to be able to find the {@link AbstractInventoryTab} in the registry.
      */
     @Nullable
     public static AbstractInventoryTab findByScreen(final Screen screen) {
