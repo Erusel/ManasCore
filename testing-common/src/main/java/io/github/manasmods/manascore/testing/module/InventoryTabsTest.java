@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2024. ManasMods
+ * GNU General Public License 3
+ */
+
 package io.github.manasmods.manascore.testing.module;
 
 import io.github.manasmods.manascore.inventory.api.AbstractInventoryTab;
@@ -20,7 +25,7 @@ public class InventoryTabsTest {
 
     public static void init(int tabCount) {
         List<Item> itemFields = Arrays.stream(Items.class.getDeclaredFields())
-                .filter(field -> Modifier.isStatic(field.getModifiers()))
+                .filter(field -> Modifier.isStatic(field.getModifiers()) && Modifier.isFinal(field.getModifiers()) && Modifier.isPublic(field.getModifiers()))
                 .filter(field -> field.getType().equals(Item.class))
                 .map(field -> {
                     try {

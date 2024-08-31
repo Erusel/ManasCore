@@ -11,6 +11,17 @@ ext {
     ]
 }
 
+loom {
+    mods {
+        includedProjects.forEach {
+            def moduleProject = project("$it-common")
+            register(moduleProject.name) {
+                sourceSet("main", moduleProject)
+            }
+        }
+    }
+}
+
 dependencies {
     includedProjects.forEach {
         implementation(project(path: "$it-common", configuration: 'namedElements')) { transitive false }
