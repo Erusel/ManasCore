@@ -49,8 +49,8 @@ subprojects {
         var nameOffset = project.path.startsWith(':') && nameSeparatorIndex > 0 ? 1 : 0
 
         module_name = project.path.substring(nameOffset, nameSeparatorIndex == -1 ? project.path.length() : nameSeparatorIndex)
-
         mod_id = "${rootProject.archives_name}_$module_name"
+        module_type = project.name.substring(project.name.lastIndexOf('-') + 1)
     }
 
     architectury {
@@ -78,6 +78,15 @@ subprojects {
             } else {
                 it.runDir = "../run/$it.environment"
             }
+        }
+
+        mixin {
+            useLegacyMixinAp = true
+            defaultRefmapName = "${project.mod_id}-${project.module_type}.refmap.json"
+        }
+
+        interfaceInjection {
+            enableDependencyInterfaceInjection = true
         }
     }
 
@@ -270,5 +279,13 @@ subprojects {
             useJavaOutput()
             buildConfigField(String, "MOD_ID", "$project.mod_id")
         }
+    }
+
+    if (!project.name.endsWith("common")) {
+        task copyJar(type: Copy) {
+            from remapJar
+            into "${rootProject.projectDir}/build/${module_type}"
+        }
+        build.dependsOn copyJar
     }
 }
