@@ -10,6 +10,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
@@ -36,6 +37,7 @@ public class InventoryTabSwitcherWidget extends AbstractWidget {
                     updateTabs();
                 })
                 .pos(this.parent.leftPos - 20 - 2, this.parent.topPos - 20 - 2)
+                .tooltip(Tooltip.create(Component.translatable("createWorld.customize.custom.prev")))
                 .size(20, 20)
                 .build();
         this.nextButton = Button.builder(Component.literal(">"), pButton -> {
@@ -43,6 +45,7 @@ public class InventoryTabSwitcherWidget extends AbstractWidget {
                     updateTabs();
                 })
                 .pos(parent.leftPos + parent.imageWidth + 2, this.parent.topPos - 20 - 2)
+                .tooltip(Tooltip.create(Component.translatable("createWorld.customize.custom.next")))
                 .size(20, 20)
                 .build();
     }
