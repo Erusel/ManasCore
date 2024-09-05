@@ -19,6 +19,9 @@ public class TestInventoryTab extends AbstractInventoryTab {
         guiGraphics.renderFakeItem(this.iconStack, this.getX() + 5, this.getY() + 8 + (isTopRow ? 1 : -1));
     }
 
+    /**
+     * Called when the player clicks on the tab
+     */
     @Override
     public void sendOpenContainerPacket() {
         // Send a packet to the server to request the container to be opened
