@@ -12,6 +12,7 @@ import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
 import net.minecraft.network.chat.Component;
 import org.lwjgl.glfw.GLFW;
 
@@ -57,7 +58,8 @@ public class InventoryTabSwitcherWidget extends AbstractWidget {
         }
 
         if (maxPages > 1) {
-            guiGraphics.drawCenteredString(Minecraft.getInstance().font, this.page + " / " + this.maxPages, this.parent.width / 2, 2, Color.WHITE.getRGB());
+            var font = Minecraft.getInstance().font;
+            guiGraphics.drawCenteredString(font, this.page + " / " + this.maxPages, this.parent.width / 2, this.parent.topPos - font.lineHeight - CreativeModeInventoryScreen.TAB_HEIGHT, Color.WHITE.getRGB());
         }
 
         for (var tab : this.tabs.values()) {
