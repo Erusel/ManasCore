@@ -1,6 +1,6 @@
 # ManasCore
 
-Documentation: [ManasCore](https://manascore.github.io/ManasCore/)
+Documentation: [ManasCore](https://manasmods.github.io/ManasCore/)
 
 ## Contributing
 
