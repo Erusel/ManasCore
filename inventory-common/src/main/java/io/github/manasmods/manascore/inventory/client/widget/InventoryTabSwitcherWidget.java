@@ -74,11 +74,14 @@ public class InventoryTabSwitcherWidget extends AbstractWidget {
     }
 
     public void updateTabs() {
-        this.tabs.forEach((integer, widget) -> {
-            int tabScreenIndex = integer;
-            while (tabScreenIndex > AbstractInventoryTab.TABS_PER_ROW * 2) {
-                tabScreenIndex -= AbstractInventoryTab.TABS_PER_ROW * 2;
-            }
+        this.tabs.forEach((tabIndex, widget) -> {
+            int tabScreenIndex = (tabIndex % (AbstractInventoryTab.TABS_PER_ROW * 2));
+
+            double totalTabsOnPage = AbstractInventoryTab.TABS_PER_ROW * 2;
+            boolean isVisible = Math.floor((tabIndex - 1) / totalTabsOnPage) == (this.page - 1);
+            widget.active = isVisible;
+
+            if (!isVisible) return;
 
             final int yOffset = 4;
             final int xOffset = 1;
@@ -89,45 +92,32 @@ public class InventoryTabSwitcherWidget extends AbstractWidget {
                     widget.setY(parent.topPos - widget.getHeight() + yOffset);
                     widget.setCurrentTabIndex(tabScreenIndex);
                 }
-                case 2, 3 -> {
-                    widget.setX(parent.leftPos + widget.getWidth() * (tabScreenIndex - 1) + (xOffset * tabScreenIndex - 1) + 1);
-                    widget.setY(parent.topPos - widget.getHeight() + yOffset);
-                    widget.setCurrentTabIndex(tabScreenIndex);
-                }
-                case 4, 5 -> {
-                    widget.setX(parent.leftPos + widget.getWidth() * (tabScreenIndex - 1) + (xOffset * tabScreenIndex - 1) + 2);
+                case 2, 3, 4, 5 -> {
+                    widget.setX(parent.leftPos + widget.getWidth() * (tabScreenIndex - 1) + (tabScreenIndex * 3));
                     widget.setY(parent.topPos - widget.getHeight() + yOffset);
                     widget.setCurrentTabIndex(tabScreenIndex);
                 }
                 case 6 -> {
-                    widget.setX(parent.leftPos + widget.getWidth() * (tabScreenIndex - 1) + (xOffset * tabScreenIndex - 1) + 3);
+                    widget.setX(parent.leftPos + widget.getWidth() * (tabScreenIndex - 1) + (xOffset * tabScreenIndex - 1) + 15);
                     widget.setY(parent.topPos - widget.getHeight() + yOffset);
                     widget.setCurrentTabIndex(tabScreenIndex);
                 }
                 case 7 -> {
                     widget.setX(parent.leftPos);
-                    widget.setY(parent.topPos + parent.imageWidth - yOffset - 11);
+                    widget.setY(parent.topPos + parent.imageWidth - yOffset - 10);
                     widget.setCurrentTabIndex(tabScreenIndex);
                 }
-                case 8, 9 -> {
-                    widget.setX(parent.leftPos + widget.getWidth() * (tabScreenIndex - 7) + (xOffset * tabScreenIndex - 7) + 1);
-                    widget.setY(parent.topPos + parent.imageWidth - yOffset - 11);
+                case 8, 9, 10, 11 -> {
+                    widget.setX(parent.leftPos + widget.getWidth() * (tabScreenIndex - AbstractInventoryTab.TABS_PER_ROW - 1) + ((tabScreenIndex - AbstractInventoryTab.TABS_PER_ROW) * 3));
+                    widget.setY(parent.topPos + parent.imageWidth - yOffset - 10);
                     widget.setCurrentTabIndex(tabScreenIndex);
                 }
-                case 10, 11 -> {
-                    widget.setX(parent.leftPos + widget.getWidth() * (tabScreenIndex - 7) + (xOffset * tabScreenIndex - 7) + 2);
-                    widget.setY(parent.topPos + parent.imageWidth - yOffset - 11);
-                    widget.setCurrentTabIndex(tabScreenIndex);
-                }
-                case 12 -> {
-                    widget.setX(parent.leftPos + widget.getWidth() * (tabScreenIndex - 7) + (xOffset * tabScreenIndex - 7) + 3);
-                    widget.setY(parent.topPos + parent.imageWidth - yOffset - 11);
-                    widget.setCurrentTabIndex(tabScreenIndex);
+                case 0 -> {
+                    widget.setX(parent.leftPos + widget.getWidth() * (AbstractInventoryTab.TABS_PER_ROW - 1) + (xOffset * AbstractInventoryTab.TABS_PER_ROW - 1) + 15);
+                    widget.setY(parent.topPos + parent.imageWidth - yOffset - 10);
+                    widget.setCurrentTabIndex(AbstractInventoryTab.TABS_PER_ROW * 2);
                 }
             }
-
-            boolean isVisible = Math.ceil(integer / 12F) == this.page;
-            widget.active = isVisible;
         });
     }
 

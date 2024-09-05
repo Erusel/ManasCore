@@ -47,6 +47,7 @@ public class InventoryTabsTest {
     }
 
     private static class TestInventoryTab extends AbstractInventoryTab {
+        private static int selectedIndex = -1;
         private final ItemStack iconStack;
         private final int index;
 
@@ -65,6 +66,12 @@ public class InventoryTabsTest {
         @Override
         public void sendOpenContainerPacket() {
             LOG.info("Called Test Tab {} opening request", this.index);
+            selectedIndex = selectedIndex == this.index ? -1 : this.index;
+        }
+
+        @Override
+        public boolean isCurrent() {
+            return selectedIndex == this.index;
         }
     }
 }

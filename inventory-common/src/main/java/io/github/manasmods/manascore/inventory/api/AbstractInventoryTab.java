@@ -17,7 +17,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 
 public abstract class AbstractInventoryTab extends Button implements InventoryTab {
-    public static final int TABS_PER_ROW = 7;
+    public static final int TABS_PER_ROW = 6;
     protected final Minecraft minecraft;
     @Getter
     @Setter
@@ -49,12 +49,20 @@ public abstract class AbstractInventoryTab extends Button implements InventoryTa
     protected abstract void renderIcon(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks);
 
     public void renderBg(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
-        ResourceLocation[] textureSource = this.currentTabIndex < TABS_PER_ROW
+        ResourceLocation[] textureSource = this.currentTabIndex <= TABS_PER_ROW
                 ? isCurrent() ? CreativeModeInventoryScreen.SELECTED_TOP_TABS : CreativeModeInventoryScreen.UNSELECTED_TOP_TABS
                 : isCurrent() ? CreativeModeInventoryScreen.SELECTED_BOTTOM_TABS : CreativeModeInventoryScreen.UNSELECTED_BOTTOM_TABS;
-        int textureIndex = this.currentTabIndex % TABS_PER_ROW;
-        ResourceLocation texture = textureSource[textureIndex];
+        int textureIndex = (this.currentTabIndex - 1) % TABS_PER_ROW;
+        ResourceLocation texture = textureSource[this.currentTabIndex % TABS_PER_ROW == 0 ? textureSource.length - 1 : textureIndex];
+
+        if (isCurrent()) {
+            guiGraphics.pose().pushPose();
+            guiGraphics.pose().translate(0F, 0F, 1F);
+        }
         guiGraphics.blitSprite(texture, this.getX(), this.getY(), CreativeModeInventoryScreen.TAB_WIDTH, CreativeModeInventoryScreen.TAB_HEIGHT);
+        if (isCurrent()) {
+            guiGraphics.pose().popPose();
+        }
     }
 
     public boolean isCurrent() {
