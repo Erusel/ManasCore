@@ -5,9 +5,21 @@
 
 ext {
     includedProjects = [
-        ":network",
-        ":storage"
+            ":network",
+            ":storage",
+            ":inventory"
     ]
+}
+
+loom {
+    mods {
+        includedProjects.forEach {
+            def moduleProject = project("$it-common")
+            register(moduleProject.name) {
+                sourceSet("main", moduleProject)
+            }
+        }
+    }
 }
 
 dependencies {
