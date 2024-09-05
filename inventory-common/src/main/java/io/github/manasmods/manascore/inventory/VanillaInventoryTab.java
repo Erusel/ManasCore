@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2024. ManasMods
+ * GNU General Public License 3
+ */
+
 package io.github.manasmods.manascore.inventory;
 
 import io.github.manasmods.manascore.inventory.api.AbstractInventoryTab;
@@ -22,7 +27,8 @@ public class VanillaInventoryTab extends AbstractInventoryTab {
 
     @Override
     protected void renderIcon(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
-        guiGraphics.renderFakeItem(this.iconStack, this.getX() + 6, this.getY() + 8);
+        var isTopRow = this.getCurrentTabIndex() < TABS_PER_ROW;
+        guiGraphics.renderFakeItem(this.iconStack, this.getX() + 5, this.getY() + 8 + (isTopRow ? 1 : -1));
     }
 
     @Override

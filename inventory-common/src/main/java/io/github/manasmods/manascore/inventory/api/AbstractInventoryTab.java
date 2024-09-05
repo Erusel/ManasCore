@@ -39,7 +39,11 @@ public abstract class AbstractInventoryTab extends Button implements InventoryTa
         RenderSystem.enableDepthTest();
 
         renderBg(guiGraphics, mouseX, mouseY, partialTicks);
+
+        guiGraphics.pose().pushPose();
+        guiGraphics.pose().translate(0.0F, 0.0F, 100.0F);
         renderIcon(guiGraphics, mouseX, mouseY, partialTicks);
+        guiGraphics.pose().popPose();
 
         guiGraphics.setColor(1.0F, 1.0F, 1.0F, 1.0F);
     }
