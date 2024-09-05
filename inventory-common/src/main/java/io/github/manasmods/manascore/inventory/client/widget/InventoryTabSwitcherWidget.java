@@ -27,7 +27,7 @@ public class InventoryTabSwitcherWidget extends AbstractWidget {
     private boolean isFocused = false;
 
     public InventoryTabSwitcherWidget(AbstractContainerScreen parent, int maxPages) {
-        super(0,0,parent.width, 0, Component.empty());
+        super(0, 0, parent.width, 0, Component.empty());
         this.parent = parent;
         this.maxPages = maxPages;
         this.prevButton = Button.builder(Component.literal("<"), pButton -> {
@@ -60,10 +60,17 @@ public class InventoryTabSwitcherWidget extends AbstractWidget {
             guiGraphics.drawCenteredString(Minecraft.getInstance().font, this.page + " / " + this.maxPages, this.parent.width / 2, 2, Color.WHITE.getRGB());
         }
 
-        this.tabs.values()
-                .stream()
-                .filter(AbstractInventoryTab::isActive)
-                .forEach(abstractInventoryTab -> abstractInventoryTab.render(guiGraphics, mouseX, mouseY, partialTicks));
+        for (var tab : this.tabs.values()) {
+            if (!tab.isActive()) continue;
+            tab.render(guiGraphics, mouseX, mouseY, partialTicks);
+        }
+    }
+
+    public void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+        for (var tab : this.tabs.values()) {
+            if (!tab.isActive()) continue;
+            tab.renderBg(guiGraphics, mouseX, mouseY, partialTicks);
+        }
     }
 
     public void updateTabs() {

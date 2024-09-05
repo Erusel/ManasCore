@@ -38,8 +38,6 @@ public abstract class AbstractInventoryTab extends Button implements InventoryTa
         RenderSystem.enableBlend();
         RenderSystem.enableDepthTest();
 
-        renderBg(guiGraphics, mouseX, mouseY, partialTicks);
-
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(0.0F, 0.0F, 100.0F);
         renderIcon(guiGraphics, mouseX, mouseY, partialTicks);
@@ -50,7 +48,7 @@ public abstract class AbstractInventoryTab extends Button implements InventoryTa
 
     protected abstract void renderIcon(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks);
 
-    protected void renderBg(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+    public void renderBg(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
         ResourceLocation[] textureSource = this.currentTabIndex < TABS_PER_ROW
                 ? isCurrent() ? CreativeModeInventoryScreen.SELECTED_TOP_TABS : CreativeModeInventoryScreen.UNSELECTED_TOP_TABS
                 : isCurrent() ? CreativeModeInventoryScreen.SELECTED_BOTTOM_TABS : CreativeModeInventoryScreen.UNSELECTED_BOTTOM_TABS;
