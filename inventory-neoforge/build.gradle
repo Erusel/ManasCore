@@ -6,3 +6,7 @@
 loom {
     accessWidenerPath = project(":inventory-common").loom.accessWidenerPath
 }
+
+remapJar {
+    atAccessWideners.add("${project.mod_id}.accesswidener")
+}
