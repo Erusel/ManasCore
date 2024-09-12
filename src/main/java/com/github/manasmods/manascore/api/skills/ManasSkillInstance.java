@@ -309,7 +309,14 @@ public class ManasSkillInstance implements Cloneable {
     }
 
     /**
-     * Set the remove time of this instance.
+     * @return the removal time of this instance.
+     */
+    public int getRemoveTime() {
+        return this.removeTime;
+    }
+
+    /**
+     * Set the removal time of this instance.
      */
     public void setRemoveTime(int removeTime) {
         this.removeTime = removeTime;
@@ -317,7 +324,7 @@ public class ManasSkillInstance implements Cloneable {
     }
 
     /**
-     * Decrease the remove time of this instance.
+     * Decrease the removal time of this instance.
      */
     public void decreaseRemoveTime(int time) {
         this.removeTime -= time;

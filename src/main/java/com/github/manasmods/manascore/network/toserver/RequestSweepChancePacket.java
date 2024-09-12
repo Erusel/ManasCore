@@ -37,7 +37,7 @@ public class RequestSweepChancePacket {
     }
 
     private void sweepAttack(Player player) {
-        double radiusAddition = player.getAttackRange() / 2;
+        double radiusAddition = player.getAttackRange() / 2 - 1;
         float sweepAttack = 1.0F + getSweepingDamageRatio(player) * getAttackDamage(player);
 
         AABB sweepArea = player.getBoundingBox().inflate(1.0 + radiusAddition, 0.25, 1.0 + radiusAddition)
