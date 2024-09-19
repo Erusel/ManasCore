@@ -5,6 +5,8 @@
 package com.github.manasmods.manascore.attribute;
 
 import com.github.manasmods.manascore.ManasCore;
+import com.github.manasmods.manascore.api.attribute.event.ArrowCriticalChanceEvent;
+import com.github.manasmods.manascore.api.attribute.event.CriticalChanceEvent;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.protocol.game.ClientboundAnimatePacket;
 import net.minecraft.server.level.ServerLevel;
@@ -15,6 +17,7 @@ import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingJumpEvent;
 import net.minecraftforge.event.entity.living.LivingFallEvent;
@@ -65,14 +68,17 @@ public class ManasCoreAttributeHandler {
     public static void applyEntityCrit(final LivingHurtEvent e) {
         if (!(e.getSource().getDirectEntity() instanceof LivingEntity entity)) return; // Direct attack
         if (entity instanceof Player) return; // Players have their own Critical Event
-        double critChance = entity.getAttributeValue(ManasCoreAttributes.CRIT_CHANCE.get()) / 100; // Convert to %
-
-        RandomSource rand = entity.getRandom();
-        if (rand.nextFloat() > critChance) return;
-        float critMultiplier = (float) entity.getAttributeValue(ManasCoreAttributes.CRIT_MULTIPLIER.get());
-        e.setAmount(e.getAmount() * critMultiplier);
-
         LivingEntity target = e.getEntity();
+
+        double critChance = entity.getAttributeValue(ManasCoreAttributes.CRIT_CHANCE.get()) / 100; // Convert to %
+        float critMultiplier = (float) entity.getAttributeValue(ManasCoreAttributes.CRIT_MULTIPLIER.get());
+        CriticalChanceEvent event = new CriticalChanceEvent(entity, target, critMultiplier, critChance);
+        if (MinecraftForge.EVENT_BUS.post(event)) return;
+
+        RandomSource random = entity.getRandom();
+        if (random.nextFloat() > event.getCritChance()) return;
+        e.setAmount(e.getAmount() * event.getDamageModifier());
+
         target.getLevel().playSound(null, target.getX(), target.getY(), target.getZ(),
                 SoundEvents.PLAYER_ATTACK_CRIT, entity.getSoundSource(), 1.0F, 1.0F);
         if (entity.getLevel() instanceof ServerLevel level)
@@ -81,16 +87,19 @@ public class ManasCoreAttributeHandler {
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     public static void modifyCrit(final CriticalHitEvent e) {
+        if (e.isVanillaCritical()) {
+            e.setDamageModifier(e.getDamageModifier() * (float) e.getEntity().getAttributeValue(ManasCoreAttributes.CRIT_MULTIPLIER.get()));
+            return;
+        }
+
         double critChance = e.getEntity().getAttributeValue(ManasCoreAttributes.CRIT_CHANCE.get()) / 100; // convert to %
-        RandomSource rand = e.getEntity().getRandom();
-
-        // Exit if this hit isn't a crit
-        if (rand.nextFloat() > critChance && !e.isVanillaCritical()) return;
-
         float critMultiplier = (float) e.getEntity().getAttributeValue(ManasCoreAttributes.CRIT_MULTIPLIER.get());
-        float critModifier = e.getDamageModifier() * critMultiplier;
+        CriticalChanceEvent event = new CriticalChanceEvent(e.getEntity(), e.getTarget(), e.getDamageModifier() * critMultiplier, critChance);
+        if (MinecraftForge.EVENT_BUS.post(event)) return;
 
-        e.setDamageModifier(critModifier);
+        RandomSource random = e.getEntity().getRandom();
+        if (random.nextFloat() > event.getCritChance()) return; // Exit if this hit isn't a crit
+        e.setDamageModifier(event.getDamageModifier());
         e.setResult(Event.Result.ALLOW);
     }
 
@@ -100,11 +109,14 @@ public class ManasCoreAttributeHandler {
         if (!(e.getEntity() instanceof AbstractArrow arrow)) return;
         if (arrow.getPersistentData().getBoolean("manascore.crit.calc.done")) return;
         if (!(arrow.getOwner() instanceof LivingEntity owner)) return;
+
         // Check if current arrow is a crit arrow
         if (!arrow.isCritArrow()) {
             double critChance = owner.getAttributeValue(ManasCoreAttributes.CRIT_CHANCE.get());
-            RandomSource rand = owner.getRandom();
-            arrow.setCritArrow(rand.nextDouble() <= critChance);
+            ArrowCriticalChanceEvent event = new ArrowCriticalChanceEvent(owner, arrow, critChance);
+
+            if (MinecraftForge.EVENT_BUS.post(event)) return;
+            arrow.setCritArrow(owner.getRandom().nextDouble() <= event.getCritChance());
         }
         arrow.getPersistentData().putBoolean("manascore.crit.calc.done", true);
     }
