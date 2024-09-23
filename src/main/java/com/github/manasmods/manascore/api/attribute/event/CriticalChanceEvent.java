@@ -20,7 +20,8 @@ public class CriticalChanceEvent extends LivingEvent {
     public CriticalChanceEvent(LivingEntity attacker, Entity target, float damageModifier, double critChance) {
         super(attacker);
         this.target = target;
-        this.oldDamageModifier = damageModifier;
         this.critChance = critChance;
+        this.damageModifier = damageModifier;
+        this.oldDamageModifier = damageModifier;
     }
 }
