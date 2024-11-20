@@ -15,7 +15,7 @@
   "environment": "*",
   "entrypoints": {
     "main": [
-      "io.github.manasmods.manascore.config.fabric.ManasCoreInventoryFabric"
+      "io.github.manasmods.manascore.inventory.fabric.ManasCoreInventoryFabric"
     ],
     "client": []
   },
