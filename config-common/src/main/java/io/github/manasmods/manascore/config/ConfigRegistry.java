@@ -23,20 +23,20 @@ public class ConfigRegistry {
 
     public static void registerConfig(ManasConfig config) {
         registeredConfigs.add(config);
-        ManasCoreConfig.LOG.info("Config: " + config.getClass().getSimpleName() + " registered");
+        ManasCoreConfig.LOG.info(config.getClass().getSimpleName() + " registered");
     }
 
     public static void loadConfigs() {
-        registeredConfigs.forEach((config) -> {
+        registeredConfigs.forEach(config -> {
             Path startPath = Paths.get("config/" + config.getClass().getSimpleName().toLowerCase() + ".json");
             try {
                 if (Files.exists(startPath)) {
                     String string = Files.readString(startPath);
                     ManasConfig loadedConfig = gson.fromJson(string, config.getClass());
                     loadedConfigs.add(loadedConfig);
-                    ManasCoreConfig.LOG.info("Config: " + config.getClass().getSimpleName() + " loaded");
+                    ManasCoreConfig.LOG.info( config.getClass().getSimpleName() + " loaded");
                 } else {
-                    ManasCoreConfig.LOG.info("Config: " + config.getClass().getSimpleName() + " not found");
+                    ManasCoreConfig.LOG.info( config.getClass().getSimpleName() + " not found");
                 }
             } catch (IOException e) {
                 ManasCoreConfig.LOG.error("Error loading config: " + config.getClass().getSimpleName());
@@ -53,7 +53,7 @@ public class ConfigRegistry {
     }
 
     public static void createConfigs() {
-        registeredConfigs.forEach((config) -> {
+        registeredConfigs.forEach(config -> {
             String content = gson.toJson(config);
             Path startPath = Paths.get("config/" + "/" + config.getClass().getSimpleName() + ".json");
             try {
