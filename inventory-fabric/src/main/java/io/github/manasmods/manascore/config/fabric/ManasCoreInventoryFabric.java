@@ -1,4 +1,4 @@
-package io.github.manasmods.manascore.inventory.fabric;
+package io.github.manasmods.manascore.config.fabric;
 
 import io.github.manasmods.manascore.inventory.ManasCoreInventory;
 import net.fabricmc.api.ModInitializer;
