@@ -5,30 +5,24 @@
 
 package io.github.manasmods.manascore.command;
 
-import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import io.github.manasmods.manascore.command.api.Command;
 import io.github.manasmods.manascore.command.api.Execute;
 import io.github.manasmods.manascore.command.api.Permission;
-import io.github.manasmods.manascore.command.api.parameter.Enum;
-import io.github.manasmods.manascore.command.api.parameter.Literal;
 import io.github.manasmods.manascore.command.api.parameter.Sender;
-import io.github.manasmods.manascore.command.api.parameter.Uuid;
 import io.github.manasmods.manascore.command.internal.CommandArgumentRegistry;
 import lombok.RequiredArgsConstructor;
-import net.minecraft.commands.CommandSource;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
-import net.minecraft.server.level.ServerPlayer;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -99,7 +93,7 @@ public class CommandAnnotationHandler {
 
                         var types = method.getParameterTypes();
                         var parameters = method.getParameters();
-                        var allowsConsole = true;
+                        var allowsConsole = new AtomicBoolean(true);
                         // Node hierarchy (Ordered from first param -> last param)
                         List<List<ArgumentBuilder<CommandSourceStack, ?>>> nodeArgumentHierarchy = new ArrayList<>();
                         // List of ArgumentBuilders for each parameter
@@ -112,68 +106,30 @@ public class CommandAnnotationHandler {
                             final var parameter = parameters[i];
                             final List<ArgumentBuilder<CommandSourceStack, ?>> newNodes = new ArrayList<>();
                             boolean isSenderArgument = false;
+                            var parameterAnnotations = parameter.getAnnotations();
 
-                            if (parameter.isAnnotationPresent(Literal.class)) {
-                                ManasCoreCommand.LOG.debug("Found Literal Parameter in Method {} in {} at index {}", method.getName(), this.commandClass.getName(), i);
-                                if (!argumentType.isAssignableFrom(String.class)) {
-                                    throw new RuntimeException("Method %s in %s has a parameter annotated with @Literal but is not a String".formatted(method.getName(), this.commandClass.getName()));
-                                }
-                                var literals = parameter.getAnnotation(Literal.class);
-                                for (String literal : literals.value()) {
-                                    int index = newNodes.size();
-                                    newNodes.add(Commands.literal(literal));
-                                    addValueTo2DList(parameterArgumentSuppliers, index, i, commandContext -> literal);
-                                }
-                            }
+                            final var finalizedI = i;
+                            final var argumentNodeHandler = new CommandArgumentRegistry.ArgumentNodeHandler(
+                                    newNodes,
+                                    (index, value) -> addValueTo2DList(parameterArgumentSuppliers, index, finalizedI, value),
+                                    value -> addValueTo2DList(parameterArgumentSuppliers, value),
+                                    allowsConsole,
+                                    parameter.getName()
+                            );
 
-                            if (parameter.isAnnotationPresent(Sender.class)) {
-                                ManasCoreCommand.LOG.debug("Found Sender Parameter in Method {} in {} at index {}", method.getName(), this.commandClass.getName(), i);
-                                if (argumentType.isAssignableFrom(CommandSourceStack.class)) {
-                                    addValueTo2DList(parameterArgumentSuppliers, CommandContext::getSource);
-                                } else if (argumentType.isAssignableFrom(ServerPlayer.class)) {
-                                    addValueTo2DList(parameterArgumentSuppliers, commandContext -> commandContext.getSource().getPlayerOrException());
-                                    allowsConsole = false;
-                                } else if (argumentType.isAssignableFrom(CommandSource.class)) {
-                                    addValueTo2DList(parameterArgumentSuppliers, commandContext -> commandContext.getSource().source);
-                                } else {
-                                    throw new RuntimeException("Method %s in %s has a parameter annotated with @Sender but is not a ServerPlayer, CommandSourceStack or CommandSource".formatted(method.getName(), this.commandClass.getName()));
-                                }
-                                isSenderArgument = true;
-                            }
-
-                            if (parameter.isAnnotationPresent(Enum.class)) {
-                                ManasCoreCommand.LOG.debug("Found Enum Parameter in Method {} in {} at index {}", method.getName(), this.commandClass.getName(), i);
-                                if (!argumentType.isEnum()) {
-                                    throw new RuntimeException("Method %s in %s has a parameter annotated with @Enum but is not an Enum".formatted(method.getName(), this.commandClass.getName()));
+                            for (var parameterAnnotation : parameterAnnotations) {
+                                var argumentFactory = (CommandArgumentRegistry.CommandArgumentFactory) argumentRegistry.get(argumentType, parameterAnnotation.getClass());
+                                // Skip if no factory is found
+                                if (argumentFactory == null) {
+                                    ManasCoreCommand.LOG.debug("No ArgumentFactory found for Parameter Annotation {} in Method {} in {} at index {}", parameterAnnotation.getClass().getName(), method.getName(), this.commandClass.getName(), i);
+                                    continue;
                                 }
 
-                                var enumAnnotation = parameter.getAnnotation(Enum.class);
-                                var enumClass = enumAnnotation.value();
-
-                                for (var constant : enumClass.getEnumConstants()) {
-                                    int index = newNodes.size();
-                                    newNodes.add(Commands.literal(constant.name()));
-                                    addValueTo2DList(parameterArgumentSuppliers, index, i, commandContext -> constant);
+                                if(parameterAnnotation instanceof Sender){
+                                    isSenderArgument = true;
                                 }
-                            }
 
-                            if (parameter.isAnnotationPresent(Uuid.class)) {
-                                ManasCoreCommand.LOG.debug("Found Uuid Parameter in Method {} in {} at index {}", method.getName(), this.commandClass.getName(), i);
-                                if (!argumentType.isAssignableFrom(UUID.class)) {
-                                    throw new RuntimeException("Method %s in %s has a parameter annotated with @Uuid but is not a UUID".formatted(method.getName(), this.commandClass.getName()));
-                                }
-                                var uuidAnnotation = parameter.getAnnotation(Uuid.class);
-                                var argumentName = uuidAnnotation.value().isBlank() ? parameter.getName() : uuidAnnotation.value();
-                                int index = newNodes.size();
-                                newNodes.add(Commands.argument(argumentName, StringArgumentType.word()));
-                                addValueTo2DList(parameterArgumentSuppliers, index, i, commandContext -> {
-                                    var uuidString = StringArgumentType.getString(commandContext, argumentName);
-                                    try {
-                                        return UUID.fromString(uuidString);
-                                    } catch (Exception e) {
-                                        throw new CommandSyntaxException(new SimpleCommandExceptionType(e::getMessage), e::getMessage);
-                                    }
-                                });
+                                argumentFactory.create(parameterAnnotation, argumentNodeHandler);
                             }
 
                             if (newNodes.isEmpty() && !isSenderArgument) {
@@ -195,10 +151,9 @@ public class CommandAnnotationHandler {
 
                             return Stream.empty();
                         }
-                        ;
 
                         // Add Permission check and execution to the last node
-                        final var allowsConsoleFinal = allowsConsole;
+                        final var allowsConsoleFinal = allowsConsole.get();
                         for (int i = 0; i < lastParameterNodes.size(); i++) {
                             var builder = lastParameterNodes.get(i);
                             final var argumentSuppliers = parameterArgumentSuppliers.get(i);
@@ -299,7 +254,7 @@ public class CommandAnnotationHandler {
             return permissionNodes.values();
         }
 
-        interface ParameterSupplier<R> {
+        public interface ParameterSupplier<R> {
             R get(CommandContext<CommandSourceStack> commandContext) throws CommandSyntaxException;
         }
 

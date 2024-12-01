@@ -5,10 +5,7 @@
 
 package io.github.manasmods.manascore.testing.module;
 
-import io.github.manasmods.manascore.command.api.Command;
-import io.github.manasmods.manascore.command.api.CommandRegistry;
-import io.github.manasmods.manascore.command.api.Execute;
-import io.github.manasmods.manascore.command.api.Permission;
+import io.github.manasmods.manascore.command.api.*;
 import io.github.manasmods.manascore.command.api.parameter.Enum;
 import io.github.manasmods.manascore.command.api.parameter.Literal;
 import io.github.manasmods.manascore.command.api.parameter.Sender;
@@ -22,6 +19,10 @@ public class CommandModuleTest {
     private static final Component RESPONSE = Component.literal("Works!");
 
     public static void init() {
+        CommandArgumentRegistrationEvent.EVENT.register(registry -> {
+            registry.registerEnum(TestEnum.class);
+        });
+
         CommandRegistry.registerCommand(TestCommand.class);
     }
 
@@ -39,7 +40,7 @@ public class CommandModuleTest {
     @Command(value = "bar")
     public static class TestSubCommand {
         @Execute
-        public boolean args(@Sender CommandSourceStack sender, @Literal("literal") String l, @Uuid UUID uuid, @Enum(TestEnum.class) TestEnum _enum) {
+        public boolean args(@Sender CommandSourceStack sender, @Literal("literal") String l, @Uuid("uuid") UUID uuid, @Enum(TestEnum.class) TestEnum _enum) {
             sender.sendSystemMessage(RESPONSE.copy()
                     .append("\nLiteral: '")
                     .append(Component.literal(l))
