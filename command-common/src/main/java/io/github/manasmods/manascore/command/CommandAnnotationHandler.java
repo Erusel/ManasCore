@@ -40,7 +40,7 @@ public class CommandAnnotationHandler {
                 commandClass,
                 factory.get(),
                 rootAnnotation.value(),
-                Arrays.stream(commandClass.getDeclaredMethods()).filter(method -> method.isAnnotationPresent(Execute.class)),
+                Arrays.stream(commandClass.getDeclaredMethods()).filter(method -> method.isAnnotationPresent(Execute.class)).toList(),
                 rootAnnotation.subCommands()
         ));
     }
@@ -77,7 +77,7 @@ public class CommandAnnotationHandler {
         private final Class<?> commandClass;
         private final Object commandClassInstance;
         private final String[] nodeLiterals;
-        private final Stream<Method> executors;
+        private final List<Method> executors;
         private final Class<?>[] subCommandClasses;
         private final Map<String, Permission> permissionNodes = new HashMap<>();
 
@@ -86,7 +86,7 @@ public class CommandAnnotationHandler {
             AtomicReference<Consumer<LiteralArgumentBuilder<CommandSourceStack>>> rootExecutor = new AtomicReference<>(builder -> {
             });
             // Create ArgumentBuilders for each executor in the command class
-            var arguments = executors.flatMap(method -> {
+            var arguments = executors.stream().flatMap(method -> {
                         if (!method.getReturnType().isAssignableFrom(boolean.class) && !method.getReturnType().isAssignableFrom(Boolean.class)) {
                             throw new RuntimeException("Method %s in %s has a return type that is not a boolean".formatted(method.getName(), this.commandClass.getName()));
                         }
@@ -211,7 +211,7 @@ public class CommandAnnotationHandler {
 
                 try {
                     var instance = subCommandClass.getDeclaredConstructor().newInstance();
-                    CommandNode subCommandNode = new CommandNode(subCommandClass, instance, subCommandNodes, Arrays.stream(subCommandClass.getDeclaredMethods()).filter(method -> method.isAnnotationPresent(Execute.class)), subCommandAnnotation.subCommands());
+                    CommandNode subCommandNode = new CommandNode(subCommandClass, instance, subCommandNodes, Arrays.stream(subCommandClass.getDeclaredMethods()).filter(method -> method.isAnnotationPresent(Execute.class)).toList(), subCommandAnnotation.subCommands());
                     subCommands.addAll(subCommandNode.build(argumentRegistry));
                     subCommandNode.permissionNodes.forEach(permissionNodes::putIfAbsent);
                 } catch (InstantiationException | IllegalAccessException | InvocationTargetException |

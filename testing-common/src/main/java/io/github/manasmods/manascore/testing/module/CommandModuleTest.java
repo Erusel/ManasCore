@@ -28,8 +28,6 @@ public class CommandModuleTest {
 
     @Command(value = "foo", subCommands = {TestSubCommand.class})
     public static class TestCommand {
-        // TODO Check Permission
-        @Permission("manascore.command.test")
         @Execute
         public boolean withPerms(@Sender CommandSourceStack sender) {
             sender.sendSystemMessage(RESPONSE);
@@ -50,6 +48,13 @@ public class CommandModuleTest {
                     .append(_enum.name())
                     .append("'")
             );
+            return true;
+        }
+
+        @Permission("manascore.command.test")
+        @Execute
+        public boolean withPerms(@Sender CommandSourceStack sender, @Literal("perms") String l) {
+            sender.sendSystemMessage(RESPONSE);
             return true;
         }
     }

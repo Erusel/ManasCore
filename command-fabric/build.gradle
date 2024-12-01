@@ -4,6 +4,6 @@
  */
 
 dependencies {
-    modImplementation "maven.modrinth:luckperms:$fabric_luckperms_version"
+    //modImplementation "me.lucko:fabric-permissions-api:$fabric_permissions_api_version"
 }
 
