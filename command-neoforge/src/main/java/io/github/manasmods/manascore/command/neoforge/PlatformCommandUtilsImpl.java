@@ -5,6 +5,7 @@
 
 package io.github.manasmods.manascore.command.neoforge;
 
+import io.github.manasmods.manascore.command.ManasCoreCommand;
 import io.github.manasmods.manascore.command.api.Permission;
 import net.minecraft.commands.CommandSourceStack;
 import net.neoforged.neoforge.server.permission.PermissionAPI;
@@ -24,9 +25,14 @@ public class PlatformCommandUtilsImpl {
     }
 
     public static void registerPermission(Permission permission) {
-        var modId = permission.value().substring(0, permission.value().indexOf('.'));
-        var nodeName = permission.value().substring(permission.value().indexOf('.') + 1);
-        PERMISSIONS.put(permission.value(), new PermissionNode<>(modId, nodeName, PermissionTypes.BOOLEAN, (player, playerUUID, context) -> {
+        var permissionId = permission.value();
+        if (PERMISSIONS.containsKey(permissionId)) {
+            ManasCoreCommand.LOG.info("Permission with id {} already exists. Skipped registering.", permissionId);
+            return;
+        }
+        var modId = permissionId.substring(0, permissionId.indexOf('.'));
+        var nodeName = permissionId.substring(permissionId.indexOf('.') + 1);
+        PERMISSIONS.put(permissionId, new PermissionNode<>(modId, nodeName, PermissionTypes.BOOLEAN, (player, playerUUID, context) -> {
             if (player == null) return true;
             return player.hasPermissions(permission.permissionLevel().getLevel());
         }));

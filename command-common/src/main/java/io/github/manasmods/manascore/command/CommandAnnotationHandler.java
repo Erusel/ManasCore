@@ -18,6 +18,7 @@ import io.github.manasmods.manascore.command.api.parameter.Enum;
 import io.github.manasmods.manascore.command.api.parameter.Literal;
 import io.github.manasmods.manascore.command.api.parameter.Sender;
 import io.github.manasmods.manascore.command.api.parameter.Uuid;
+import io.github.manasmods.manascore.command.internal.CommandArgumentRegistry;
 import lombok.RequiredArgsConstructor;
 import net.minecraft.commands.CommandSource;
 import net.minecraft.commands.CommandSourceStack;
@@ -35,27 +36,19 @@ import java.util.stream.Stream;
 
 @ApiStatus.Internal
 public class CommandAnnotationHandler {
-    static final List<LiteralArgumentBuilder<CommandSourceStack>> COMMANDS = new ArrayList<>();
+    static final List<CommandNode> COMMANDS = new ArrayList<>();
 
     public static <T> void registerCommand(Class<T> commandClass, Supplier<T> factory) {
         var rootAnnotation = requireCommandAnnotation(commandClass);
         validateSubCommands(rootAnnotation);
 
-        CommandNode rootNode = new CommandNode(
+        COMMANDS.add(new CommandNode(
                 commandClass,
                 factory.get(),
                 rootAnnotation.value(),
                 Arrays.stream(commandClass.getDeclaredMethods()).filter(method -> method.isAnnotationPresent(Execute.class)),
                 rootAnnotation.subCommands()
-        );
-
-        try {
-            COMMANDS.addAll(rootNode.build());
-            rootNode.getPermissions().forEach(PlatformCommandUtils::registerPermission);
-        } catch (InvocationTargetException | NoSuchMethodException | InstantiationException |
-                 IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
+        ));
     }
 
     /**
@@ -95,7 +88,7 @@ public class CommandAnnotationHandler {
         private final Map<String, Permission> permissionNodes = new HashMap<>();
 
 
-        public List<LiteralArgumentBuilder<CommandSourceStack>> build() throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+        public List<LiteralArgumentBuilder<CommandSourceStack>> build(CommandArgumentRegistry argumentRegistry) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
             AtomicReference<Consumer<LiteralArgumentBuilder<CommandSourceStack>>> rootExecutor = new AtomicReference<>(builder -> {
             });
             // Create ArgumentBuilders for each executor in the command class
@@ -264,7 +257,7 @@ public class CommandAnnotationHandler {
                 try {
                     var instance = subCommandClass.getDeclaredConstructor().newInstance();
                     CommandNode subCommandNode = new CommandNode(subCommandClass, instance, subCommandNodes, Arrays.stream(subCommandClass.getDeclaredMethods()).filter(method -> method.isAnnotationPresent(Execute.class)), subCommandAnnotation.subCommands());
-                    subCommands.addAll(subCommandNode.build());
+                    subCommands.addAll(subCommandNode.build(argumentRegistry));
                     subCommandNode.permissionNodes.forEach(permissionNodes::putIfAbsent);
                 } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
                          NoSuchMethodException e) {
