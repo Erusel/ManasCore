@@ -118,14 +118,14 @@ public class CommandAnnotationHandler {
                             );
 
                             for (var parameterAnnotation : parameterAnnotations) {
-                                var argumentFactory = (CommandArgumentRegistry.CommandArgumentFactory) argumentRegistry.get(argumentType, parameterAnnotation.getClass());
+                                var argumentFactory = (CommandArgumentRegistry.CommandArgumentFactory) argumentRegistry.get(argumentType, parameterAnnotation.annotationType());
                                 // Skip if no factory is found
                                 if (argumentFactory == null) {
                                     ManasCoreCommand.LOG.debug("No ArgumentFactory found for Parameter Annotation {} in Method {} in {} at index {}", parameterAnnotation.getClass().getName(), method.getName(), this.commandClass.getName(), i);
                                     continue;
                                 }
 
-                                if(parameterAnnotation instanceof Sender){
+                                if (parameterAnnotation instanceof Sender) {
                                     isSenderArgument = true;
                                 }
 
