@@ -4,6 +4,6 @@
  */
 
 dependencies {
-    //modImplementation "me.lucko:fabric-permissions-api:$fabric_permissions_api_version"
+    modImplementation "me.lucko:fabric-permissions-api:$fabric_permissions_api_version"
 }
 
